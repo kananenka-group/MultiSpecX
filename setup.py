@@ -8,7 +8,7 @@ setup(
     author='Alexei A. Kananenka',
     author_email='akanane@udel.edu',
     license='MIT',
-    packages=['MultiSpecX'],
+    packages=['multispecx'],
     install_requires=['numpy',
                       'mdtraj'
                       ],
