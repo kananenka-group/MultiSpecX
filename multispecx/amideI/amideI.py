@@ -20,4 +20,3 @@ class AmideI:
      # create a system object
      s = System(self.itp)
      s.readITP()
-
