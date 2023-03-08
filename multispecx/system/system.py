@@ -12,7 +12,7 @@ class System:
    def read(self):
       # reading topology file
       self.molecules, self.molnum = self.readTOP()
-      print (f" Found following molecules in the {self.top_file} file")
+      print (f" Found following molecules in {self.top_file} file")
       [print(f" {line[0]}  {line[1]}") for line in self.molnum]
 
       # reading itp files
@@ -81,7 +81,6 @@ class System:
                   record=True
       return molecules, mol_numbers
 
-   # read itp files:
    def readITP(self):
       """
          Read *.itp files
