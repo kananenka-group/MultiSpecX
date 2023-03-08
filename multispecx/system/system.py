@@ -24,7 +24,8 @@ class System:
          sys.exit(" exiting...")
 
       # reading GRO file
-      self.system = self.readGRO()
+      self.natoms, self.system = self.readGRO()
+      print (f" Total number of atoms: {self.natoms}")
       
 
    def readGRO(self):
@@ -38,10 +39,10 @@ class System:
          next(f)
          line=f.readline()
          natoms=int(line.split()[0])
-         for line in f:
-             if len(line.split())>3:
-                system.append([line[0:5].strip(),line[5:10].strip(),line[10:15].strip()])
-      return system
+         for n in range(natoms):
+             line=f.readline()
+             system.append([line[0:5].strip(),line[5:10].strip(),line[10:15].strip()])
+      return natoms, system
 
    def readTOP(self):
       """
