@@ -6,6 +6,7 @@ import sys
 class System:
    itp_files: list = field(default_factory=lambda: ['topol.itp'])
    top_file:  str = "topol.top"
+   gro_file:  str = "confout.gro"
 
    # reading gromacs files to learn about the system
    def read(self):
@@ -20,10 +21,27 @@ class System:
          print(" The following systems were not found in *.itp files:")
          x = np.transpose(np.argwhere(self.molecule_find==False))[0]
          [print (f" {self.molecules[i]}") for i in x]
-         sys.exit(" existing...")
+         sys.exit(" exiting...")
 
-      # analyze itp files
+      # reading GRO file
+      self.system = self.readGRO()
+      
 
+   def readGRO(self):
+      """
+         Reading GROMACS configuration files to be able to match atoms
+         in the system and topology.
+      """
+      system=[]
+      with open(self.gro_file,"r") as f:
+         print (f" >>>>> Reading configuration file: {self.gro_file}")
+         next(f)
+         line=f.readline()
+         natoms=int(line.split()[0])
+         for line in f:
+             if len(line.split())>3:
+                system.append([line[0:5].strip(),line[5:10].strip(),line[10:15].strip()])
+      return system
 
    def readTOP(self):
       """
