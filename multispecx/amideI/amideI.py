@@ -18,5 +18,5 @@ class AmideI:
 
    def generateHamiltonian(self): 
      # create a system object
-     s = System(self.itp)
-     s.readITP()
+     s = System(self.itp,self.top)
+     s.read()

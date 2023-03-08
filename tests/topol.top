@@ -1,0 +1,58 @@
+;
+;       File 'topol.top' was generated
+;       By user: onbekend (0)
+;       On host: onbekend
+;       At date: Thu Jan 22 15:47:40 2015
+;
+;       This is a standalone topology file
+;
+;       It was generated using program:
+;       pdb2gmx_d - VERSION 4.5.2
+;
+;       Command line was:
+;       /home/hue/bin/gmx452/double-thread-mpi/bin/pdb2gmx_d -f 5.pdb -ter -glu -posrefc 1000
+;
+;       Force field was read from the standard Gromacs share directory.
+;
+
+; Include forcefield parameters
+#include "gromos53a6.ff/forcefield.itp"
+
+; Include chain topologies
+#include "topol_Protein1.itp"
+#include "topol_Protein2.itp"
+#include "topol_Protein3.itp"
+#include "topol_Protein4.itp"
+#include "topol_DPPC.itp"
+#include "topol_POTion.itp"
+#include "topol_CLion.itp"
+#include "topol_bindion.itp"
+
+; Include water topology
+#include "gromos53a6.ff/spc.itp"
+
+#ifdef POSRES_WATER
+; Position restraint for each water oxygen
+[ position_restraints ]
+;  i funct       fcx        fcy        fcz
+   1    1       1000       1000       1000
+#endif
+
+; Include topology for ions
+#include "gromos53a6.ff/ions.itp"
+
+[ system ]
+; Name
+Protein
+
+[ molecules ]
+; Compound        #mols
+Protein1             1
+Protein2            1
+Protein3            1
+Protein4            1
+DPPC                1
+POTion               1
+CLion                1
+bindion              1
+SOL              9556
