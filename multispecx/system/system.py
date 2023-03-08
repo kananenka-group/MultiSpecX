@@ -26,7 +26,18 @@ class System:
       # reading GRO file
       self.natoms, self.system = self.readGRO()
       print (f" Total number of atoms: {self.natoms}")
+
+      # do the match
+      out = self.match()
       
+   
+   def match(self):
+      """
+         match all the information and output for each atom in the
+         configuration its charge, charge group, mass, and a list to which
+         molecule this atom belongs
+      """
+      return 0
 
    def readGRO(self):
       """
