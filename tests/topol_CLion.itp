@@ -1,0 +1,216 @@
+;
+;	File 'topol_Ion7.itp' was generated
+;	By user: onbekend (0)
+;	On host: onbekend
+;	At date: Thu Jan 22 15:47:45 2015
+;
+;	This is a include topology file
+;
+;	It was generated using program:
+;	pdb2gmx_d - VERSION 4.5.2
+;
+;	Command line was:
+;	/home/hue/bin/gmx452/double-thread-mpi/bin/pdb2gmx_d -f 5.pdb -ter -glu -posrefc 1000 
+;
+;	Force field was read from the standard Gromacs share directory.
+;
+
+[ moleculetype ]
+; Name            nrexcl
+CLion                3
+
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr     charge       mass  typeB    chargeB      massB
+; residue   1 CL  rtp CL   q -1.0
+     1        CL-      1     CL     CL      1         -1     35.453   ; qtot -1
+; residue   2 CL  rtp CL   q -1.0
+     2        CL-      2     CL     CL      2         -1     35.453   ; qtot -2
+; residue   3 CL  rtp CL   q -1.0
+     3        CL-      3     CL     CL      3         -1     35.453   ; qtot -3
+; residue   4 CL  rtp CL   q -1.0
+     4        CL-      4     CL     CL      4         -1     35.453   ; qtot -4
+; residue   5 CL  rtp CL   q -1.0
+     5        CL-      5     CL     CL      5         -1     35.453   ; qtot -5
+; residue   6 CL  rtp CL   q -1.0
+     6        CL-      6     CL     CL      6         -1     35.453   ; qtot -6
+; residue   7 CL  rtp CL   q -1.0
+     7        CL-      7     CL     CL      7         -1     35.453   ; qtot -7
+; residue   8 CL  rtp CL   q -1.0
+     8        CL-      8     CL     CL      8         -1     35.453   ; qtot -8
+; residue   9 CL  rtp CL   q -1.0
+     9        CL-      9     CL     CL      9         -1     35.453   ; qtot -9
+; residue  10 CL  rtp CL   q -1.0
+    10        CL-     10     CL     CL     10         -1     35.453   ; qtot -10
+; residue  11 CL  rtp CL   q -1.0
+    11        CL-     11     CL     CL     11         -1     35.453   ; qtot -11
+; residue  12 CL  rtp CL   q -1.0
+    12        CL-     12     CL     CL     12         -1     35.453   ; qtot -12
+; residue  13 CL  rtp CL   q -1.0
+    13        CL-     13     CL     CL     13         -1     35.453   ; qtot -13
+; residue  14 CL  rtp CL   q -1.0
+    14        CL-     14     CL     CL     14         -1     35.453   ; qtot -14
+; residue  15 CL  rtp CL   q -1.0
+    15        CL-     15     CL     CL     15         -1     35.453   ; qtot -15
+; residue  16 CL  rtp CL   q -1.0
+    16        CL-     16     CL     CL     16         -1     35.453   ; qtot -16
+; residue  17 CL  rtp CL   q -1.0
+    17        CL-     17     CL     CL     17         -1     35.453   ; qtot -17
+; residue  18 CL  rtp CL   q -1.0
+    18        CL-     18     CL     CL     18         -1     35.453   ; qtot -18
+; residue  19 CL  rtp CL   q -1.0
+    19        CL-     19     CL     CL     19         -1     35.453   ; qtot -19
+; residue  20 CL  rtp CL   q -1.0
+    20        CL-     20     CL     CL     20         -1     35.453   ; qtot -20
+; residue  21 CL  rtp CL   q -1.0
+    21        CL-     21     CL     CL     21         -1     35.453   ; qtot -21
+; residue  22 CL  rtp CL   q -1.0
+    22        CL-     22     CL     CL     22         -1     35.453   ; qtot -22
+; residue  23 CL  rtp CL   q -1.0
+    23        CL-     23     CL     CL     23         -1     35.453   ; qtot -23
+; residue  24 CL  rtp CL   q -1.0
+    24        CL-     24     CL     CL     24         -1     35.453   ; qtot -24
+; residue  25 CL  rtp CL   q -1.0
+    25        CL-     25     CL     CL     25         -1     35.453   ; qtot -25
+; residue  26 CL  rtp CL   q -1.0
+    26        CL-     26     CL     CL     26         -1     35.453   ; qtot -26
+; residue  27 CL  rtp CL   q -1.0
+    27        CL-     27     CL     CL     27         -1     35.453   ; qtot -27
+; residue  28 CL  rtp CL   q -1.0
+    28        CL-     28     CL     CL     28         -1     35.453   ; qtot -28
+; residue  29 CL  rtp CL   q -1.0
+    29        CL-     29     CL     CL     29         -1     35.453   ; qtot -29
+; residue  30 CL  rtp CL   q -1.0
+    30        CL-     30     CL     CL     30         -1     35.453   ; qtot -30
+; residue  31 CL  rtp CL   q -1.0
+    31        CL-     31     CL     CL     31         -1     35.453   ; qtot -31
+; residue  32 CL  rtp CL   q -1.0
+    32        CL-     32     CL     CL     32         -1     35.453   ; qtot -32
+; residue  33 CL  rtp CL   q -1.0
+    33        CL-     33     CL     CL     33         -1     35.453   ; qtot -33
+; residue  34 CL  rtp CL   q -1.0
+    34        CL-     34     CL     CL     34         -1     35.453   ; qtot -34
+; residue  35 CL  rtp CL   q -1.0
+    35        CL-     35     CL     CL     35         -1     35.453   ; qtot -35
+; residue  36 CL  rtp CL   q -1.0
+    36        CL-     36     CL     CL     36         -1     35.453   ; qtot -36
+; residue  37 CL  rtp CL   q -1.0
+    37        CL-     37     CL     CL     37         -1     35.453   ; qtot -37
+; residue  38 CL  rtp CL   q -1.0
+    38        CL-     38     CL     CL     38         -1     35.453   ; qtot -38
+; residue  39 CL  rtp CL   q -1.0
+    39        CL-     39     CL     CL     39         -1     35.453   ; qtot -39
+; residue  40 CL  rtp CL   q -1.0
+    40        CL-     40     CL     CL     40         -1     35.453   ; qtot -40
+; residue  41 CL  rtp CL   q -1.0
+    41        CL-     41     CL     CL     41         -1     35.453   ; qtot -41
+; residue  42 CL  rtp CL   q -1.0
+    42        CL-     42     CL     CL     42         -1     35.453   ; qtot -42
+; residue  43 CL  rtp CL   q -1.0
+    43        CL-     43     CL     CL     43         -1     35.453   ; qtot -43
+; residue  44 CL  rtp CL   q -1.0
+    44        CL-     44     CL     CL     44         -1     35.453   ; qtot -44
+; residue  45 CL  rtp CL   q -1.0
+    45        CL-     45     CL     CL     45         -1     35.453   ; qtot -45
+; residue  46 CL  rtp CL   q -1.0
+    46        CL-     46     CL     CL     46         -1     35.453   ; qtot -46
+; residue  47 CL  rtp CL   q -1.0
+    47        CL-     47     CL     CL     47         -1     35.453   ; qtot -47
+; residue  48 CL  rtp CL   q -1.0
+    48        CL-     48     CL     CL     48         -1     35.453   ; qtot -48
+; residue  49 CL  rtp CL   q -1.0
+    49        CL-     49     CL     CL     49         -1     35.453   ; qtot -49
+; residue  50 CL  rtp CL   q -1.0
+    50        CL-     50     CL     CL     50         -1     35.453   ; qtot -50
+; residue  51 CL  rtp CL   q -1.0
+    51        CL-     51     CL     CL     51         -1     35.453   ; qtot -51
+; residue  52 CL  rtp CL   q -1.0
+    52        CL-     52     CL     CL     52         -1     35.453   ; qtot -52
+; residue  53 CL  rtp CL   q -1.0
+    53        CL-     53     CL     CL     53         -1     35.453   ; qtot -53
+; residue  54 CL  rtp CL   q -1.0
+    54        CL-     54     CL     CL     54         -1     35.453   ; qtot -54
+; residue  55 CL  rtp CL   q -1.0
+    55        CL-     55     CL     CL     55         -1     35.453   ; qtot -55
+; residue  56 CL  rtp CL   q -1.0
+    56        CL-     56     CL     CL     56         -1     35.453   ; qtot -56
+; residue  57 CL  rtp CL   q -1.0
+    57        CL-     57     CL     CL     57         -1     35.453   ; qtot -57
+; residue  58 CL  rtp CL   q -1.0
+    58        CL-     58     CL     CL     58         -1     35.453   ; qtot -58
+; residue  59 CL  rtp CL   q -1.0
+    59        CL-     59     CL     CL     59         -1     35.453   ; qtot -59
+; residue  60 CL  rtp CL   q -1.0
+    60        CL-     60     CL     CL     60         -1     35.453   ; qtot -60
+; residue  61 CL  rtp CL   q -1.0
+    61        CL-     61     CL     CL     61         -1     35.453   ; qtot -61
+; residue  62 CL  rtp CL   q -1.0
+    62        CL-     62     CL     CL     62         -1     35.453   ; qtot -62
+; residue  63 CL  rtp CL   q -1.0
+    63        CL-     63     CL     CL     63         -1     35.453   ; qtot -63
+; residue  64 CL  rtp CL   q -1.0
+    64        CL-     64     CL     CL     64         -1     35.453   ; qtot -64
+; residue  65 CL  rtp CL   q -1.0
+    65        CL-     65     CL     CL     65         -1     35.453   ; qtot -65
+; residue  66 CL  rtp CL   q -1.0
+    66        CL-     66     CL     CL     66         -1     35.453   ; qtot -66
+; residue  67 CL  rtp CL   q -1.0
+    67        CL-     67     CL     CL     67         -1     35.453   ; qtot -67
+; residue  68 CL  rtp CL   q -1.0
+    68        CL-     68     CL     CL     68         -1     35.453   ; qtot -68
+; residue  69 CL  rtp CL   q -1.0
+    69        CL-     69     CL     CL     69         -1     35.453   ; qtot -69
+; residue  70 CL  rtp CL   q -1.0
+    70        CL-     70     CL     CL     70         -1     35.453   ; qtot -70
+; residue  71 CL  rtp CL   q -1.0
+    71        CL-     71     CL     CL     71         -1     35.453   ; qtot -71
+; residue  72 CL  rtp CL   q -1.0
+    72        CL-     72     CL     CL     72         -1     35.453   ; qtot -72
+; residue  73 CL  rtp CL   q -1.0
+    73        CL-     73     CL     CL     73         -1     35.453   ; qtot -73
+; residue  74 CL  rtp CL   q -1.0
+    74        CL-     74     CL     CL     74         -1     35.453   ; qtot -74
+; residue  75 CL  rtp CL   q -1.0
+    75        CL-     75     CL     CL     75         -1     35.453   ; qtot -75
+; residue  76 CL  rtp CL   q -1.0
+    76        CL-     76     CL     CL     76         -1     35.453   ; qtot -76
+; residue  77 CL  rtp CL   q -1.0
+    77        CL-     77     CL     CL     77         -1     35.453   ; qtot -77
+; residue  78 CL  rtp CL   q -1.0
+    78        CL-     78     CL     CL     78         -1     35.453   ; qtot -78
+; residue  79 CL  rtp CL   q -1.0
+    79        CL-     79     CL     CL     79         -1     35.453   ; qtot -79
+; residue  80 CL  rtp CL   q -1.0
+    80        CL-     80     CL     CL     80         -1     35.453   ; qtot -80
+; residue  81 CL  rtp CL   q -1.0
+    81        CL-     81     CL     CL     81         -1     35.453   ; qtot -81
+; residue  82 CL  rtp CL   q -1.0
+    82        CL-     82     CL     CL     82         -1     35.453   ; qtot -82
+; residue  83 CL  rtp CL   q -1.0
+    83        CL-     83     CL     CL     83         -1     35.453   ; qtot -83
+; residue  84 CL  rtp CL   q -1.0
+    84        CL-     84     CL     CL     84         -1     35.453   ; qtot -84
+; residue  85 CL  rtp CL   q -1.0
+    85        CL-     85     CL     CL     85         -1     35.453   ; qtot -85
+; residue  86 CL  rtp CL   q -1.0
+    86        CL-     86     CL     CL     86         -1     35.453   ; qtot -86
+; residue  87 CL  rtp CL   q -1.0
+    87        CL-     87     CL     CL     87         -1     35.453   ; qtot -87
+; residue  88 CL  rtp CL   q -1.0
+    88        CL-     88     CL     CL     88         -1     35.453   ; qtot -88
+; residue  89 CL  rtp CL   q -1.0
+    89        CL-     89     CL     CL     89         -1     35.453   ; qtot -89
+; residue  90 CL  rtp CL   q -1.0
+    90        CL-     90     CL     CL     90         -1     35.453   ; qtot -90
+; residue  91 CL  rtp CL   q -1.0
+    91        CL-     91     CL     CL     91         -1     35.453   ; qtot -91
+; residue  92 CL  rtp CL   q -1.0
+    92        CL-     92     CL     CL     92         -1     35.453   ; qtot -92
+; residue  93 CL  rtp CL   q -1.0
+    93        CL-     93     CL     CL     93         -1     35.453   ; qtot -93
+; residue  94 CL  rtp CL   q -1.0
+    94        CL-     94     CL     CL     94         -1     35.453   ; qtot -94
+; residue  95 CL  rtp CL   q -1.0
+    95        CL-     95     CL     CL     95         -1     35.453   ; qtot -95
+; residue  96 CL  rtp CL   q -1.0
+    96        CL-     96     CL     CL     96         -1     35.453   ; qtot -96
+

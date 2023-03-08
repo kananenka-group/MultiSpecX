@@ -1,0 +1,39 @@
+;
+;	File 'topol_Other8.itp' was generated
+;	By user: onbekend (0)
+;	On host: onbekend
+;	At date: Thu Jan 22 15:47:45 2015
+;
+;	This is a include topology file
+;
+;	It was generated using program:
+;	pdb2gmx_d - VERSION 4.5.2
+;
+;	Command line was:
+;	/home/hue/bin/gmx452/double-thread-mpi/bin/pdb2gmx_d -f 5.pdb -ter -glu -posrefc 1000 
+;
+;	Force field was read from the standard Gromacs share directory.
+;
+
+[ moleculetype ]
+; Name            nrexcl
+bindion              3
+
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr     charge       mass  typeB    chargeB      massB
+; residue 3002 POT rtp POT  q +1.0
+     1        POT   3002    POT    POT      1          0.85    39.0981   ; qtot 1
+; residue 3004 POT rtp POT  q +1.0
+     2        POT   3004    POT    POT      2          0.91    39.0981   ; qtot 2
+; residue 3006 POT rtp POT  q +1.0
+     3        POT   3006    POT    POT      3          0.83    39.0981   ; qtot 3
+; residue 3008 POT rtp POT  q +1.0
+     4        POT   3008    POT    POT      4          1.0    39.0981   ; qtot 4
+
+
+
+; Include Position restraint file
+;#ifdef POSRES
+;#include "posre_bindion.itp"
+;#endif
+

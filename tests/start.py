@@ -1,8 +1,9 @@
 import sys
 sys.path.append("..")
 from multispecx import spectrum
+from multispecx import amideI
 
-s = spectrum.Sim(type="2DIR",dt=0.02)
+s = amideI.AmideI(itp=["topol_Protein1.itp","topol_Protein2.itp","topol_Protein2.itp","topol_Protein4.itp"])
+s.generateHamiltonian()
 
-print (s.dt)
-print (s)
+
