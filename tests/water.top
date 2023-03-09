@@ -1,0 +1,11 @@
+;
+; Include water topology
+#include "tip4p2005.itp"
+
+[ system ]
+; Name
+pure water
+
+[ molecules ]
+; Compound        #mols
+SOL               500
