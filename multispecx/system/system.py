@@ -4,6 +4,7 @@ import sys
 
 @dataclass
 class System:
+   # defaults:
    itp_files: list = field(default_factory=lambda: ['topol.itp'])
    top_file:  str = "topol.top"
    gro_file:  str = "confout.gro"
