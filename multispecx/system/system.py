@@ -33,11 +33,33 @@ class System:
    
    def match(self):
       """
-         match all the information and output for each atom in the
+         Match all the information and output for each atom in the
          configuration its charge, charge group, mass, and a list to which
-         molecule this atom belongs
+         molecule this atom belongs.
+         
+         This match function is based on GROMACS rule that states:
+         'The order of the blocks of molecule types and the numbers of 
+          such molecules must match the coordinate file that accompanies 
+          the topology when supplied to grompp.' 
+          [from GROMACS manual]:
+          https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html
       """
-      return 0
+     
+      print (f" >>>>> Matching data and generating atom info")
+      start=0 
+      atoms_info=[]
+      for mol_id, (mol, atoms) in enumerate(zip(self.molecules, self.molnum)):
+          for ind, atom in enumerate(atoms):
+             if atom[0:3] == self.system[start+ind]:
+                ats = atom[0:6].copy()
+                ats.append(mol)
+                ats.append(mol_id)
+                atoms_info.append(ats)
+          start=len(atoms_info)
+       
+      print (len(atoms_info))
+      return atoms_info
+             
 
    def readGRO(self):
       """
