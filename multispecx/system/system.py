@@ -90,13 +90,13 @@ class System:
 
       if add_h:
           hf = list(set(h_labels))
-          print(f" {len(h_labels)} Hydrogen atoms were found, types={hf} and assigned mass {h_mass}")
+          print(f" {len(h_labels)} water hydrogen atoms were found, types={hf} and assigned mass {h_mass}")
       if add_o:
           of = list(set(o_labels))
-          print(f" {len(o_labels)} Oxygen atoms were found, types={of} and assigned mass {o_mass}")
+          print(f" {len(o_labels)} water oxygen atoms were found, types={of} and assigned mass {o_mass}")
       if add_m:
           mf = list(set(m_labels))
-          print(f" {len(m_labels)} M-site atoms were found, types={mf} and assigned mass {m_mass}") 
+          print(f" {len(m_labels)} water m-site atoms were found, types={mf} and assigned mass {m_mass}") 
       return atoms_info
              
 
