@@ -30,7 +30,8 @@ class System:
       # do the match
       mol_out = self.match()
       assert self.natoms == len(mol_out), f" Assignment problem: total atoms {self.natoms}, assigned = {len(mol_out)}"
-
+ 
+      print (" >>>>> Done reading GROMACS files.")
       return mol_out
    
    def match(self):
@@ -58,7 +59,7 @@ class System:
       o_labels=[]
       m_labels=[]
      
-      print (f" >>>>> Matching data and generating atom info")
+      print (f" >>>>> Generating atom info")
       start=0 
 
       atoms_info=[]
@@ -68,8 +69,9 @@ class System:
          for s in range(mol_nums):
             for ind, atom in enumerate(atoms):
                if atom[1:3] == self.system[start+ind][1:3]:
-                  ats = atom[0:6].copy()
-                  if len(ats)==5:
+                  ats = atom[1:6].copy()
+                  ats.insert(0,self.system[start+ind][3])
+                  if len(ats)==4:
                      val=ats[-3]
                      if val in hydrogen_list:
                         ats.append(h_mass)
@@ -97,6 +99,7 @@ class System:
       if add_m:
           mf = list(set(m_labels))
           print(f" {len(m_labels)} water m-site atoms were found, types={mf} and assigned mass {m_mass}") 
+
       return atoms_info
              
 
@@ -113,7 +116,7 @@ class System:
          natoms=int(line.split()[0])
          for n in range(natoms):
              line=f.readline()
-             system.append([line[0:5].strip(),line[5:10].strip(),line[10:15].strip()])
+             system.append([line[0:5].strip(),line[5:10].strip(),line[10:15].strip(),line[15:20].strip()])
       return natoms, system
 
    def readTOP(self):
