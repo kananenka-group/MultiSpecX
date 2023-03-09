@@ -20,4 +20,6 @@ class AmideI:
    def generateHamiltonian(self): 
      # create a system object
      s = System(self.itp,self.top,self.gro)
-     s.read()
+     mol = s.read()
+
+     #print (mol)

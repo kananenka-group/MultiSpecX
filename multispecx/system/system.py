@@ -28,8 +28,10 @@ class System:
       print (f" Total number of atoms: {self.natoms}")
 
       # do the match
-      out = self.match()
-      
+      mol_out = self.match()
+      assert self.natoms == len(mol_out), f" Assignment problem: total atoms {self.natoms}, assigned = {len(mol_out)}"
+
+      return mol_out
    
    def match(self):
       """
@@ -44,20 +46,57 @@ class System:
           [from GROMACS manual]:
           https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html
       """
+      hydrogen_list = ['HW1','HW2']
+      oxygen_list   = ['OW']
+      msite_list    = ['MW']
+      h_mass        = 1.008
+      o_mass        = 15.999
+      m_mass        = 0.0
+
+      add_o = add_h = add_m = False
+      h_labels=[]
+      o_labels=[]
+      m_labels=[]
      
       print (f" >>>>> Matching data and generating atom info")
       start=0 
+
       atoms_info=[]
-      for mol_id, (mol, atoms) in enumerate(zip(self.molecules, self.molnum)):
-          for ind, atom in enumerate(atoms):
-             if atom[0:3] == self.system[start+ind]:
-                ats = atom[0:6].copy()
-                ats.append(mol)
-                ats.append(mol_id)
-                atoms_info.append(ats)
-          start=len(atoms_info)
-       
-      print (len(atoms_info))
+      for mol_id, (mol, atoms) in enumerate(zip(self.molnum, self.molecule_list)):
+         mol_name = mol[0]
+         mol_nums = int(mol[1])
+         for s in range(mol_nums):
+            for ind, atom in enumerate(atoms):
+               if atom[1:3] == self.system[start+ind][1:3]:
+                  ats = atom[0:6].copy()
+                  if len(ats)==5:
+                     val=ats[-3]
+                     if val in hydrogen_list:
+                        ats.append(h_mass)
+                        add_h=True
+                        h_labels.append(val)
+                     elif val in oxygen_list: 
+                        ats.append(o_mass)
+                        add_o=True
+                        o_labels.append(val)
+                     elif val in msite_list:
+                        ats.append(m_mass)
+                        add_m=True
+                        m_labels.append(val)
+                  ats.append(mol[0])
+                  ats.append(mol_id)
+                  atoms_info.append(ats)
+            start=len(atoms_info)
+
+      if add_h:
+          hf = list(set(h_labels))
+          print(f" {len(h_labels)} Hydrogen atoms were found, types={hf} and assigned mass {h_mass}")
+      if add_o:
+          of = list(set(o_labels))
+          print(f" {len(o_labels)} Oxygen atoms were found, types={of} and assigned mass {o_mass}")
+      if add_m:
+          mf = list(set(m_labels))
+          print(f" {len(m_labels)} M-site atoms were found, types={mf} and assigned mass {m_mass}") 
       return atoms_info
              
 
