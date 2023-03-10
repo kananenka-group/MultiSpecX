@@ -22,4 +22,4 @@ class AmideI:
      s = System(self.itp,self.top,self.gro)
      mol = s.read()
 
-     #print (mol)
+     # find indices of peptide groups in each molecule.
