@@ -16,5 +16,4 @@ class Water:
      # create a system object
      s = System(self.itp,self.top,self.gro)
      mol = s.read()
-     print (mol,len(mol))
 
