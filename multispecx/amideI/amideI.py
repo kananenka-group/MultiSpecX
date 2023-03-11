@@ -7,6 +7,7 @@ class AmideI:
    type: list = field(default_factory=lambda: ['dipole'])
    isotope_labels: list = field(default_factory=lambda: ['none'])
    itp: list = field(default_factory=lambda: ['topol.itp'])
+   amide_unit: list = field(default_factory=lambda: ['C','O','N','H'])
    gro:  str = "confout.gro" 
    xtc:  str = "traj.xtc" 
    top:  str = "topology.top"
@@ -20,6 +21,12 @@ class AmideI:
    def generateHamiltonian(self): 
      # create a system object
      s = System(self.itp,self.top,self.gro)
-     mol = s.read()
+     self.mol = s.read()
 
      # find indices of peptide groups in each molecule.
+     self.searchAmide()
+
+
+
+   def searchAmide(self):
+      print(f" Searching amide I units defined as {self.amide_unit}")
