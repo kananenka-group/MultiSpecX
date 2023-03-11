@@ -64,6 +64,7 @@ class System:
       start=0 
 
       atoms_info=[]
+      this_mol=0
       for mol_id, (mol, atoms) in enumerate(zip(self.molnum, self.molecule_list)):
          mol_name = mol[0]
          mol_nums = int(mol[1])
@@ -88,8 +89,10 @@ class System:
                         m_labels.append(val)
                   ats.append(mol[0])
                   ats.append(mol_id)
+                  ats.append(this_mol)
                   atoms_info.append(ats)
             start=len(atoms_info)
+            this_mol+=1
 
       if add_h:
           hf = list(set(h_labels))
