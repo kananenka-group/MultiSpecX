@@ -29,4 +29,4 @@ class AmideI:
 
 
    def searchAmide(self):
-      print(f" Searching amide I units defined as {self.amide_unit}")
+      print(f" >>>>> Searching amide I units defined as {self.amide_unit}")
