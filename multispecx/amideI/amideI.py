@@ -27,7 +27,7 @@ class AmideI:
      # find indices of peptide groups in each molecule.
      chrom_start_idx, n_amideI_mol = self.chromList()
      print(f"    Found {len(chrom_start_idx)} amide I chromophores: ")
-     for (nm, moln) in zip(n_amideI_mol,self.molecules):
+     for nm, moln in zip(n_amideI_mol,self.molecules):
         if nm>0:
            print(f"  {nm} in {moln[0]} ") 
 
