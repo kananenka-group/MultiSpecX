@@ -1,6 +1,7 @@
 import mdtraj as md
 from ..system import *
 from dataclasses import dataclass, field
+from .util import getIndex
 
 @dataclass
 class AmideI:
@@ -24,10 +25,27 @@ class AmideI:
      self.atoms, self.molecules, self.atoms_in_mol = s.read()
 
      # find indices of peptide groups in each molecule.
-     self.searchAmide()
+     chrom_start_idx, n_amideI_mol = self.chromList()
+     print(f"    Found {len(chrom_start_idx)} amide I chromophores: ")
+     for (nm, moln) in zip(n_amideI_mol,self.molecules):
+        if nm>0:
+           print(f"  {nm} in {moln[0]} ") 
 
-
-
-   def searchAmide(self):
-      print(f" >>>>> Searching amide I units defined as {self.amide_unit}")
-      print (self.atoms_in_mol)
+   def chromList(self):
+     print(f" >>>>> Searching amide I units defined as {self.amide_unit} for residues {self.isotope_labels}")
+     res_num = [ x[1] for x in self.atoms ]
+     res_nam = [ x[2] for x in self.atoms ]
+     atm_nam = [ x[3] for x in self.atoms ]
+     ist=0
+     cind=[]
+     nas=[]
+     for numa in self.atoms_in_mol:
+        cout = getIndex(self.amide_unit, self.isotope_labels, res_num[ist:ist+numa], res_nam[ist:ist+numa], atm_nam[ist:ist+numa])
+        nas.append(len(cout))
+        if cout:
+           cind.append(cout)
+        ist+=numa
+     return cind,nas
+         
+      
+         
