@@ -20,7 +20,7 @@ class AmideI:
    nnFmap: str = "Jansen2006"
    nnCmap: str = "Jansen2006"
    elFmap: str  = "Wang2011"
-   freq_shift: float = -66.0
+   freq_shift: float = 0.0
 
    def generateHamiltonian(self): 
      # create a system object
