@@ -21,7 +21,7 @@ class AmideI:
    def generateHamiltonian(self): 
      # create a system object
      s = System(self.itp,self.top,self.gro)
-     self.mol = s.read()
+     self.atoms, self.molecules, self.atoms_in_mol = s.read()
 
      # find indices of peptide groups in each molecule.
      self.searchAmide()
@@ -30,3 +30,4 @@ class AmideI:
 
    def searchAmide(self):
       print(f" >>>>> Searching amide I units defined as {self.amide_unit}")
+      print (self.atoms_in_mol)

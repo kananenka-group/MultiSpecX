@@ -29,11 +29,11 @@ class System:
       print (f" Total number of atoms: {self.natoms}")
 
       # do the match
-      mol_out = self.match()
-      assert self.natoms == len(mol_out), f" Assignment problem: total atoms {self.natoms}, assigned = {len(mol_out)}"
+      atoms_out, atoms_in_mol = self.match()
+      assert self.natoms == len(atoms_out), f" Assignment problem: total atoms {self.natoms}, assigned = {len(mol_out)}"
  
       print (" >>>>> Done reading GROMACS files.")
-      return mol_out
+      return atoms_out, self.molnum, atoms_in_mol
    
    def match(self):
       """
@@ -59,6 +59,7 @@ class System:
       h_labels=[]
       o_labels=[]
       m_labels=[]
+      atoms_in_mol=[]
      
       print (f" >>>>> Generating atom info")
       start=0 
@@ -91,8 +92,9 @@ class System:
                   ats.append(mol_id)
                   ats.append(this_mol)
                   atoms_info.append(ats)
-            start=len(atoms_info)
             this_mol+=1
+            atoms_in_mol.append(len(atoms_info)-start)
+            start=len(atoms_info)
 
       if add_h:
           hf = list(set(h_labels))
@@ -104,7 +106,7 @@ class System:
           mf = list(set(m_labels))
           print(f" {len(m_labels)} water m-site atoms were found, types={mf} and assigned mass {m_mass}") 
 
-      return atoms_info
+      return atoms_info, atoms_in_mol
              
 
    def readGRO(self):
