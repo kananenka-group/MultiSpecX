@@ -47,6 +47,20 @@ class System:
           the topology when supplied to grompp.' 
           [from GROMACS manual]:
           https://manual.gromacs.org/current/reference-manual/topologies/topology-file-formats.html
+
+          This function outputs a list containing the following information 
+          about each atom:
+
+          0. atom number
+          1. residue number
+          2. molecule name
+          3. atom name
+          4. charge group
+          5. atomic charge
+          6. molecule name
+          7. id of a molecule this atom belongs to (w.r.t. molecules defined in the top file)
+          8. id of a molecule this atoms belongs to (w.r.t the total number of molecules)
+
       """
       hydrogen_list = ['HW1','HW2']
       oxygen_list   = ['OW']
@@ -73,8 +87,9 @@ class System:
             for ind, atom in enumerate(atoms):
                if atom[1:3] == self.system[start+ind][1:3]:
                   ats = atom[1:6].copy()
+                  ats.insert(0,self.system[start+ind][0])
                   ats.insert(0,self.system[start+ind][3])
-                  if len(ats)==4:
+                  if len(ats)==5:
                      val=ats[-3]
                      if val in hydrogen_list:
                         ats.append(h_mass)
