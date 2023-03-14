@@ -28,7 +28,7 @@ class AmideI:
      self.atoms, self.molecules, self.atoms_in_mol = s.read()
 
      # find indices of peptide groups in each molecule.
-     chrom_start_idx, n_amideI_mol = self.chromList()
+     chrom_start_idx, amideI_list_idx, n_amideI_mol = self.chromList()
      if not chrom_start_idx:
         print(f" Did not find any amide I groups like this: {self.amideI_unit}")
         sys.exit(" exiting...")
@@ -46,14 +46,16 @@ class AmideI:
      atm_nam = [ x[3] for x in self.atoms ]
      ist=0
      cind=[]
+     aIind=[]
      nas=[]
      for numa in self.atoms_in_mol:
-        cout = getIndex(self.amideI_unit, self.isotope_labels, res_num[ist:ist+numa], res_nam[ist:ist+numa], atm_nam[ist:ist+numa])
+        cout, amd = getIndex(self.amideI_unit, self.isotope_labels, res_num[ist:ist+numa], res_nam[ist:ist+numa], atm_nam[ist:ist+numa])
+        aIind.append(amd)
         nas.append(len(cout))
         if cout:
            cind.append(cout)
         ist+=numa
-     return cind,nas
+     return cind, aIind, nas
          
       
          
