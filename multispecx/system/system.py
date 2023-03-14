@@ -62,7 +62,7 @@ class System:
           8. id of a molecule this atoms belongs to (w.r.t the total number of molecules)
 
       """
-      hydrogen_list = ['HW1','HW2']
+      hydrogen_list = ['HW1','HW2','HW']
       oxygen_list   = ['OW']
       msite_list    = ['MW']
       h_mass        = 1.008
