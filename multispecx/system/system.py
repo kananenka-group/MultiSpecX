@@ -8,6 +8,7 @@ class System:
    itp_files: list = field(default_factory=lambda: ['topol.itp'])
    top_file:  str = "topol.top"
    gro_file:  str = "confout.gro"
+   xyz_file:  str = "mol.xyz"
 
    # reading gromacs files to learn about the system
    def read(self):
@@ -62,9 +63,9 @@ class System:
           8. id of a molecule this atoms belongs to (w.r.t the total number of molecules)
 
       """
-      hydrogen_list = ['HW1','HW2','HW']
-      oxygen_list   = ['OW']
-      msite_list    = ['MW']
+      hydrogen_list = ['HW1','HW2','HW','HWT4']
+      oxygen_list   = ['OW','OWT4']
+      msite_list    = ['MW','MWT4']
       h_mass        = 1.008
       o_mass        = 15.999
       m_mass        = 0.0
@@ -202,3 +203,20 @@ class System:
                      record2=True 
                       
       return molecule_list, molecule_find  
+
+   def readXYZ(self):
+      """
+         Reading xyz files
+      """
+      atoms=[]
+      with open(self.xyz_file,"r") as f:
+         natoms = int(f.readline().split()[0])
+         xyz = np.zeros((natoms,3))
+         f.readline()
+         for na in range(natoms):
+            atom_line = f.readline().split()
+            atoms.append(atom_line[0])
+            xyz[na,0] = float(atom_line[1])    
+            xyz[na,1] = float(atom_line[2])    
+            xyz[na,2] = float(atom_line[3])    
+      return atoms, xyz
