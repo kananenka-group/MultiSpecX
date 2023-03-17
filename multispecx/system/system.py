@@ -8,7 +8,7 @@ class System:
    itp_files: list = field(default_factory=lambda: ['topol.itp'])
    top_file:  str = "topol.top"
    gro_file:  str = "confout.gro"
-   xyz_file:  str = "mol.xyz"
+   xyz_files:  str = field(default_factory=lambda: ['solute.xyz','solvent.xyz'])
 
    # reading gromacs files to learn about the system
    def read(self,read_xyz=False):
@@ -37,7 +37,7 @@ class System:
  
       atom_labels=[]
       if read_xyz:
-         atom_labels, xyz = self.readXYZ()
+         atom_labels = self.readXYZ()
 
       return atoms_out, self.molnum, atoms_in_mol, atom_labels
    
@@ -213,15 +213,16 @@ class System:
       """
          Reading xyz files
       """
-      atoms=[]
-      with open(self.xyz_file,"r") as f:
-         natoms = int(f.readline().split()[0])
-         xyz = np.zeros((natoms,3))
-         f.readline()
-         for na in range(natoms):
-            atom_line = f.readline().split()
-            atoms.append(atom_line[0])
-            xyz[na,0] = float(atom_line[1])    
-            xyz[na,1] = float(atom_line[2])    
-            xyz[na,2] = float(atom_line[3])    
-      return atoms, xyz
+      molecules=[]
+      for xyz_file in self.xyz_files:
+         print(f" >>>>> Reading xyz file: {xyz_file} ")
+         with open(xyz_file,"r") as f:
+            atoms=[]
+            natoms = int(f.readline().split()[0])
+            xyz = np.zeros((natoms,3))
+            f.readline()
+            for na in range(natoms):
+               atom_line = f.readline().split()
+               atoms.append(atom_line[0])
+            molecules.append(atoms)
+      return molecules
