@@ -11,7 +11,7 @@ class System:
    xyz_file:  str = "mol.xyz"
 
    # reading gromacs files to learn about the system
-   def read(self):
+   def read(self,read_xyz=False):
       # reading topology file
       self.molecules, self.molnum = self.readTOP()
       print (f" Found following molecules in {self.top_file} file")
@@ -34,7 +34,12 @@ class System:
       assert self.natoms == len(atoms_out), f" Assignment problem: total atoms {self.natoms}, assigned = {len(mol_out)}"
  
       print (" >>>>> Done reading GROMACS files.")
-      return atoms_out, self.molnum, atoms_in_mol
+ 
+      atom_labels=[]
+      if read_xyz:
+         atom_labels, xyz = self.readXYZ()
+
+      return atoms_out, self.molnum, atoms_in_mol, atom_labels
    
    def match(self):
       """

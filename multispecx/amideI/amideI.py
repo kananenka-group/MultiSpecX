@@ -25,7 +25,7 @@ class AmideI:
    def generateHamiltonian(self): 
      # create a system object
      s = System(self.itp,self.top,self.gro)
-     self.atoms, self.molecules, self.atoms_in_mol = s.read()
+     self.atoms, self.molecules, self.atoms_in_mol, _ = s.read()
 
      # find indices of peptide groups in each molecule.
      chrom_start_idx, amideI_list_idx, n_amideI_mol = self.chromList()

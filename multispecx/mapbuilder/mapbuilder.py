@@ -21,8 +21,9 @@ class Mapbuilder:
    def createJobs(self):
      # create a system object
      s = System(self.itp,self.top,self.gro,self.xyz)
-     self.atoms, self.molecules, self.atoms_in_mol = s.read()
-     self.chem_symbols, xyz = s.readXYZ()
+     self.atoms, self.molecules, self.atoms_in_mol, self.chem_labels = s.read(read_xyz=True)
+
+     print (self.chem_labels)
 
      
      
