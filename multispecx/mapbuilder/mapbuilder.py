@@ -43,6 +43,14 @@ class Mapbuilder:
 
      # print:
      print(f"      This molecule is matched with the following atoms from xyz files: {chem_labels_selected_mol} ") 
+     print(f">>>>> Looking for a solvent/environment.") 
      
+     # check if we have more than just solute
+     if len(self.molecules) == 1:
+        sys.exit(f" Did not find any molecules besides {self.molecules} ")
+
+     # loop over all molecules looking for a solvent
+     print (self.atoms_in_mol)
      
+
      
