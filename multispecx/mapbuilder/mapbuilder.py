@@ -21,7 +21,7 @@ class Mapbuilder:
    def createJobs(self):
      # create a system object
      s = System(self.itp,self.top,self.gro,self.xyz)
-     self.atoms, self.molecules, self.atoms_in_mol, self.chem_labels = s.read(read_xyz=True)
+     self.atoms, self.molecules, self.atoms_in_mol, self.chem_labels, self.molecule_list = s.read(read_xyz=True)
 
      # analyze information about the system
      # assuming we have one organic molecule in many solvent molecules
@@ -51,6 +51,3 @@ class Mapbuilder:
 
      # loop over all molecules looking for a solvent
      print (self.atoms_in_mol)
-     
-
-     
