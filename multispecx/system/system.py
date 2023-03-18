@@ -10,6 +10,10 @@ class System:
    gro_file:  str = "confout.gro"
    xyz_files:  str = field(default_factory=lambda: ['solute.xyz','solvent.xyz'])
 
+   hydrogen_list = ['HW1','HW2','HW','HWT4']
+   oxygen_list   = ['OW','OWT4']
+   msite_list    = ['MW','MWT4']
+
    # reading gromacs files to learn about the system
    def read(self,read_xyz=False):
       # reading topology file
@@ -39,7 +43,7 @@ class System:
       if read_xyz:
          atom_labels = self.readXYZ()
 
-      return atoms_out, self.molnum, atoms_in_mol, atom_labels
+      return atoms_out, self.molnum, atoms_in_mol, atom_labels, self.molecule_list
    
    def match(self):
       """
@@ -68,9 +72,9 @@ class System:
           8. id of a molecule this atoms belongs to (w.r.t the total number of molecules)
 
       """
-      hydrogen_list = ['HW1','HW2','HW','HWT4']
-      oxygen_list   = ['OW','OWT4']
-      msite_list    = ['MW','MWT4']
+      #hydrogen_list = ['HW1','HW2','HW','HWT4']
+      #oxygen_list   = ['OW','OWT4']
+      #msite_list    = ['MW','MWT4']
       h_mass        = 1.008
       o_mass        = 15.999
       m_mass        = 0.0
@@ -97,15 +101,15 @@ class System:
                   ats.insert(0,self.system[start+ind][3])
                   if len(ats)==5:
                      val=ats[-3]
-                     if val in hydrogen_list:
+                     if val in self.hydrogen_list:
                         ats.append(h_mass)
                         add_h=True
                         h_labels.append(val)
-                     elif val in oxygen_list: 
+                     elif val in self.oxygen_list: 
                         ats.append(o_mass)
                         add_o=True
                         o_labels.append(val)
-                     elif val in msite_list:
+                     elif val in self.msite_list:
                         ats.append(m_mass)
                         add_m=True
                         m_labels.append(val)
@@ -226,3 +230,4 @@ class System:
                atoms.append(atom_line[0])
             molecules.append(atoms)
       return molecules
+

@@ -15,5 +15,5 @@ class Water:
    def generateHamiltonian(self): 
      # create a system object
      s = System(self.itp,self.top,self.gro)
-     self.atoms, self.molecules, self.atoms_in_mol, _ = s.read()
+     self.atoms, self.molecules, self.atoms_in_mol, _, _ = s.read()
 
