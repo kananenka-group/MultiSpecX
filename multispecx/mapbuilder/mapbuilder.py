@@ -1,6 +1,8 @@
 import sys
 from dataclasses import dataclass, field
 
+from .util import check_order
+
 import mdtraj as md
 
 from ..system import *
@@ -35,9 +37,12 @@ class Mapbuilder:
         sys.exit(f" In the current implementation MapBuilder can only do 1 molecule in a solvent but you have: {self.molecules} ")
 
      # find which molecules from xyz files matches 
+     chem_labels_selected_mol=[]
+     res_atoms = [x[2] for x in self.molecule_list[res_index]]
      for n in range(len(self.chem_labels)):
         if len(self.chem_labels[n]) == self.atoms_in_mol[res_index]:
-           chem_labels_selected_mol = self.chem_labels[n]
+           if check_order(res_atoms, self.chem_labels[n]):
+              chem_labels_selected_mol = self.chem_labels[n]
      if not chem_labels_selected_mol:
         sys.exit(f" Cannot find the corresponding xyz file. ")
 
@@ -49,4 +54,3 @@ class Mapbuilder:
      assert len(self.molecules) > 1, f" Did not find any molecules besides {self.molecules} "
 
      # loop over all molecules looking for a solvent
-     print (self.atoms_in_mol)
