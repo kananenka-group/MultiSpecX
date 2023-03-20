@@ -59,4 +59,10 @@ class Mapbuilder:
      solv_list = [val[0] for x, val in enumerate(self.molecules) if val[0] not in s_resid ]
      print(f"      The following molecules were found: {solv_list}") 
 
+     # find q chem representation of all solvent molecules
+     assert len(solv_list) == 1, f"  So far only one molecule type can be solvent (more complex envirnments will be implemened in the future"
+
+     solv = solv_list[0] 
+     print (self.molecule_list)
+     
  
