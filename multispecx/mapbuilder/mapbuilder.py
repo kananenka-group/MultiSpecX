@@ -21,13 +21,16 @@ class Mapbuilder:
    soft: str = "Gaussian"
 
    def createJobs(self):
+     self.extract_solute_solvent() 
+
+   def extract_solute_solvent(self):
      # create a system object
      s = System(self.itp,self.top,self.gro,self.xyz)
      self.atoms, self.molecules, self.atoms_in_mol, self.chem_labels, self.molecule_list = s.read(read_xyz=True)
 
      # analyze information about the system
      # assuming we have one organic molecule in many solvent molecules
-     print(f">>>>> Looking for a molecule for which the map will be built.")
+     print(f" >>>>> Looking for a molecule for which the map will be built.")
      res_num = [ x[1] for x in self.molecules ]
      if res_num.count("1") == 1:
         res_index = res_num.index("1")
@@ -44,7 +47,7 @@ class Mapbuilder:
            if check_order(res_atoms, self.chem_labels[n]):
               chem_labels_selected_mol = self.chem_labels[n]
               print(f"      This molecule is matched with the following atoms from {self.xyz[n]} file: {chem_labels_selected_mol} ") 
-              print(f">>>>> Looking for a solvent/environment.") 
+              print(f" >>>>> Looking for a solvent/environment.") 
            else:
               sys.exit(f" Check order of atoms in xyz file for '{self.molecules[res_index][0]}' should be compatible with configuration file: {res_atoms}")
      if not chem_labels_selected_mol:
