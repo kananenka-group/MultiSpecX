@@ -6,3 +6,10 @@ def check_order(md, tr):
          return False
 
     return True           
+
+def check_4site_water(solv_atoms, Mlist):
+   for atom in solv_atoms:
+     if atom in Mlist:
+        return True
+   return False 
+   

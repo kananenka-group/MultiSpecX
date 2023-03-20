@@ -1,7 +1,7 @@
 import sys
 from dataclasses import dataclass, field
 
-from .util import check_order
+from .util import check_order, check_4site_water
 
 import mdtraj as md
 
@@ -62,7 +62,12 @@ class Mapbuilder:
      # find q chem representation of all solvent molecules
      assert len(solv_list) == 1, f"  So far only one molecule type can be solvent (more complex envirnments will be implemened in the future"
 
-     solv = solv_list[0] 
-     print (self.molecule_list)
+     # find out what solvent it is
+     res_names = [ x[0] for x in self.molecules ]
+     for solvent in solv_list:
+        solv_index = res_names.index(solvent)
+        solv_atoms = [ x[2] for x in self.molecule_list[solv_index] ] 
+        if check_4site_water(solv_atoms, s.msite_list):
+           print (f"      {solvent} appears to be 4-site water.")
      
  
