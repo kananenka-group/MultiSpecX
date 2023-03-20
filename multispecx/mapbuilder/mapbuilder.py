@@ -41,6 +41,8 @@ class Mapbuilder:
         sys.exit(f" In the current implementation MapBuilder can only do 1 molecule in a solvent but you have: {self.molecules} ")
 
      # find which molecules from xyz files matches 
+     # note that this can also be 4-site water so, later, we would
+     # need to incorporate this functionality.
      chem_labels_selected_mol=[]
      res_atoms = [x[2] for x in self.molecule_list[res_index]]
      for n in range(len(self.chem_labels)):
