@@ -1,4 +1,5 @@
 import sys
+import os
 from dataclasses import dataclass, field
 
 from .util import check_order, check_4site_water
@@ -18,7 +19,8 @@ class Mapbuilder:
    basis:  str = "6-311++G(d,p)"
    vib:  str = "normal"
    nframes: int = 1
-   soft: str = "Gaussian"
+   software: str = "Gaussian"
+   dir: str = os.getcwd()
 
    def createJobs(self):
      self.solute, self.solvent = self.extract_solute_solvent() 
