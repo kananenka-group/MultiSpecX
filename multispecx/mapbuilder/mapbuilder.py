@@ -64,10 +64,24 @@ class Mapbuilder:
 
      # find out what solvent it is
      res_names = [ x[0] for x in self.molecules ]
+     solvent_atoms=[]
      for solvent in solv_list:
         solv_index = res_names.index(solvent)
         solv_atoms = [ x[2] for x in self.molecule_list[solv_index] ] 
-        if check_4site_water(solv_atoms, s.msite_list):
+        Msite_ind = check_4site_water(solv_atoms, s.msite_list)
+        if Msite_ind > 0:
            print (f"      {solvent} appears to be 4-site water.")
+           for n in range(len(self.chem_labels)):
+              if check_order(solv_atoms[:Msite_ind]+solv_atoms[Msite_ind+1:], self.chem_labels[n]):
+                 solvent_atoms.append(solvent)
+                 solvent_atoms.append(self.chem_labels[n])
+                 solvent_atoms.append(Msite_ind)
+        else:
+           # just add like a normal solvent
+           for n in range(len(self.chem_labels)):
+              if check_order(solv_atoms, self.chem_labels[n]):
+                 solvent_atoms.append(solvent)
+                 solvent_atoms.append(self.chem_labels[n])
+                 solvent_atoms.append([])  
      
- 
+     # done with the solvent
