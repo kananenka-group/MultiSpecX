@@ -43,6 +43,8 @@ class Mapbuilder:
         if len(self.chem_labels[n]) == self.atoms_in_mol[res_index]:
            if check_order(res_atoms, self.chem_labels[n]):
               chem_labels_selected_mol = self.chem_labels[n]
+           else:
+              sys.exit(f" Check order of atoms in xyz file for '{self.molecules[res_index][0]}' should be compatible with configuration file: {res_atoms}")
      if not chem_labels_selected_mol:
         sys.exit(f" Cannot find the corresponding xyz file. ")
 
@@ -54,3 +56,7 @@ class Mapbuilder:
      assert len(self.molecules) > 1, f" Did not find any molecules besides {self.molecules} "
 
      # loop over all molecules looking for a solvent
+     solv_list = [val[0] for x, val in enumerate(self.molecules) if val[0] not in s_resid ]
+     print(f"      The following molecules were found: {solv_list}") 
+
+ 
