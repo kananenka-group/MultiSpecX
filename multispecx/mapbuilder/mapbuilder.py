@@ -43,14 +43,13 @@ class Mapbuilder:
         if len(self.chem_labels[n]) == self.atoms_in_mol[res_index]:
            if check_order(res_atoms, self.chem_labels[n]):
               chem_labels_selected_mol = self.chem_labels[n]
+              print(f"      This molecule is matched with the following atoms from {self.xyz[n]} file: {chem_labels_selected_mol} ") 
+              print(f">>>>> Looking for a solvent/environment.") 
            else:
               sys.exit(f" Check order of atoms in xyz file for '{self.molecules[res_index][0]}' should be compatible with configuration file: {res_atoms}")
      if not chem_labels_selected_mol:
         sys.exit(f" Cannot find the corresponding xyz file. ")
 
-     # print:
-     print(f"      This molecule is matched with the following atoms from xyz files: {chem_labels_selected_mol} ") 
-     print(f">>>>> Looking for a solvent/environment.") 
      
      # check if we have more than just solute
      assert len(self.molecules) > 1, f" Did not find any molecules besides {self.molecules} "
@@ -70,12 +69,13 @@ class Mapbuilder:
         solv_atoms = [ x[2] for x in self.molecule_list[solv_index] ] 
         Msite_ind = check_4site_water(solv_atoms, s.msite_list)
         if Msite_ind > 0:
-           print (f"      {solvent} appears to be 4-site water.")
+           print (f"      {solvent} appears to be 4-site water: {solv_atoms}.")
            for n in range(len(self.chem_labels)):
               if check_order(solv_atoms[:Msite_ind]+solv_atoms[Msite_ind+1:], self.chem_labels[n]):
                  solvent_atoms.append(solvent)
                  solvent_atoms.append(self.chem_labels[n])
                  solvent_atoms.append(Msite_ind)
+                 print(f"      {solvent} is matched with the following atoms from {self.xyz[n]} file: {self.chem_labels[n]}")
         else:
            # just add like a normal solvent
            for n in range(len(self.chem_labels)):
