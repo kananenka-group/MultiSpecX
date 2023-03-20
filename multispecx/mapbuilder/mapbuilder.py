@@ -21,8 +21,7 @@ class Mapbuilder:
    soft: str = "Gaussian"
 
    def createJobs(self):
-     solute, solvent = self.extract_solute_solvent() 
-     print (solute, solvent)
+     self.solute, self.solvent = self.extract_solute_solvent() 
 
    def extract_solute_solvent(self):
      # create a system object
