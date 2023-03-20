@@ -21,7 +21,8 @@ class Mapbuilder:
    soft: str = "Gaussian"
 
    def createJobs(self):
-     self.extract_solute_solvent() 
+     solute, solvent = self.extract_solute_solvent() 
+     print (solute, solvent)
 
    def extract_solute_solvent(self):
      # create a system object
@@ -45,15 +46,17 @@ class Mapbuilder:
      for n in range(len(self.chem_labels)):
         if len(self.chem_labels[n]) == self.atoms_in_mol[res_index]:
            if check_order(res_atoms, self.chem_labels[n]):
-              chem_labels_selected_mol = self.chem_labels[n]
+              chem_labels_selected_mol.append(s_resid)
+              chem_labels_selected_mol.append(self.chem_labels[n])
+              chem_labels_selected_mol.append([])
               print(f"      This molecule is matched with the following atoms from {self.xyz[n]} file: {chem_labels_selected_mol} ") 
-              print(f" >>>>> Looking for a solvent/environment.") 
            else:
               sys.exit(f" Check order of atoms in xyz file for '{self.molecules[res_index][0]}' should be compatible with configuration file: {res_atoms}")
      if not chem_labels_selected_mol:
         sys.exit(f" Cannot find the corresponding xyz file. ")
 
      
+     print(f" >>>>> Looking for a solvent/environment.") 
      # check if we have more than just solute
      assert len(self.molecules) > 1, f" Did not find any molecules besides {self.molecules} "
 
@@ -86,5 +89,6 @@ class Mapbuilder:
                  solvent_atoms.append(solvent)
                  solvent_atoms.append(self.chem_labels[n])
                  solvent_atoms.append([])  
+
+     return chem_labels_selected_mol, solvent_atoms
      
-     # done with the solvent
