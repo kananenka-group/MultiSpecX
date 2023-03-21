@@ -23,7 +23,15 @@ class Mapbuilder:
    dir: str = os.getcwd()
 
    def createJobs(self):
+     """
+        Read snapshot from MD simulation, turn MD configuration into
+        input file for Qchem calculation
+     """
      self.solute, self.solvent = self.extract_solute_solvent() 
+
+     t = md.load(self.xtc, top=self.gro)
+     #for frame in range(self.nframes):
+     #   t[frame].xyz
 
    def extract_solute_solvent(self):
      # create a system object
