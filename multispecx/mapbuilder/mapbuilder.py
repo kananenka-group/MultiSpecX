@@ -30,8 +30,8 @@ class Mapbuilder:
      self.solute, self.solvent = self.extract_solute_solvent() 
 
      t = md.load(self.xtc, top=self.gro)
-     #for frame in range(self.nframes):
-     #   t[frame].xyz
+     for frame in range(self.nframes):
+        xyz = t[frame].xyz
 
    def extract_solute_solvent(self):
      # create a system object
