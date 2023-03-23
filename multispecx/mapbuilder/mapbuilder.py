@@ -1,5 +1,6 @@
 import sys
 import os
+from pathlib import Path
 from dataclasses import dataclass, field
 
 from .util import check_order, check_4site_water
@@ -20,7 +21,8 @@ class Mapbuilder:
    vib:  str = "normal"
    nframes: int = 1
    software: str = "Gaussian"
-   dir: str = os.getcwd()
+   ncores: int = 1
+   wdir: str = os.getcwd()
    # cut-offs for explicit solvent and point charges
    # default values are taken for water from Skinner papers
    cut_off1: float = 4.0
@@ -38,6 +40,11 @@ class Mapbuilder:
         xyz = 10.0*t.xyz[frame,:,:]
         solu_xyz = xyz[self.solu_ind,:]
         solv_xyz = xyz[self.solv_ind,:]
+
+        # rotate here...
+
+        # input file
+        self.QC_input_file(solu_xyz, solv_xyz, frame)
 
    def extract_solute_solvent(self):
      # create a system object
@@ -115,4 +122,32 @@ class Mapbuilder:
      solv_idx = [ int(atom[0])-1 for atom in self.atoms if atom[7] in solv_list]
      
      return chem_labels_selected_mol, solvent_atoms, solu_idx, solv_idx
+
      
+   def QC_input_file(self, solute, solvent, frame):
+      """
+         Here we will write an input file for electronic structure calculation
+      """
+      path = Path(os.path.join(self.wdir,f"{frame}"))
+      path.mkdir(parents=True, exist_ok=True)
+
+      if self.software.lower() == "gaussian":
+         self.write_Gaussian_input(solute, solvent, path)
+      else:
+         sys.exit(" Unrecognized option: software. At this time only Gaussian is supported")
+
+
+
+   def write_Gaussian_input(self, solute, solvent, path):
+      """
+         Gaussian DFT job
+      """      
+      input_file = path/"input.com"
+
+      with open(input_file,"w") as f:
+         f.write(f"%nprocshared={self.ncores}\n")
+         f.write(f"# Opt Freq {self.method}/{self.basis} NoSymm Int=Ultrafine SCF=tight Test\n")
+         f.write(" \n")
+         f.write("comment line\n")
+         f.write(" \n")
+         f.write("0 1\n")
