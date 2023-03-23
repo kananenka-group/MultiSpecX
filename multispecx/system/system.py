@@ -99,7 +99,8 @@ class System:
                   ats = atom[1:6].copy()
                   ats.insert(0,self.system[start+ind][0])
                   ats.insert(0,self.system[start+ind][3])
-                  if len(ats)==5:
+                  #if len(ats)==5:
+                  if len(ats)==6:
                      val=ats[-3]
                      if val in self.hydrogen_list:
                         ats.append(h_mass)
