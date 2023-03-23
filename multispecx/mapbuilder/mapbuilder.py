@@ -27,11 +27,13 @@ class Mapbuilder:
         Read snapshot from MD simulation, turn MD configuration into
         input file for Qchem calculation
      """
-     self.solute, self.solvent = self.extract_solute_solvent() 
+     self.solute, self.solvent, self.solu_ind, self.solv_ind = self.extract_solute_solvent() 
 
      t = md.load(self.xtc, top=self.gro)
      for frame in range(self.nframes):
-        xyz = 10.0*t[frame].xyz
+        xyz = 10.0*t.xyz[frame,:,:]
+        solu_xyz = xyz[self.solu_ind,:]
+        solv_xyz = xyz[self.solv_ind,:]
 
    def extract_solute_solvent(self):
      # create a system object
@@ -101,5 +103,9 @@ class Mapbuilder:
                  solvent_atoms.append(self.chem_labels[n])
                  solvent_atoms.append([])  
 
-     return chem_labels_selected_mol, solvent_atoms
+     # find out indices of solute and solvent in the configuration 
+     solu_idx = [ int(atom[0])-1 for atom in self.atoms if atom[7] == s_resid]
+     solv_idx = [ int(atom[0])-1 for atom in self.atoms if atom[7] in solv_list]
+     
+     return chem_labels_selected_mol, solvent_atoms, solu_idx, solv_idx
      
