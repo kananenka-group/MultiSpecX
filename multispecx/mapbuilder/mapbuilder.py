@@ -105,6 +105,9 @@ class Mapbuilder:
 
      # find out indices of solute and solvent in the configuration 
      solu_idx = [ int(atom[0])-1 for atom in self.atoms if atom[7] == s_resid]
+
+     # this line below works for a single solvent, need to extend it in the future
+     # to support more than one type of molecule in the environment
      solv_idx = [ int(atom[0])-1 for atom in self.atoms if atom[7] in solv_list]
      
      return chem_labels_selected_mol, solvent_atoms, solu_idx, solv_idx
