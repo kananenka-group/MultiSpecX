@@ -21,6 +21,10 @@ class Mapbuilder:
    nframes: int = 1
    software: str = "Gaussian"
    dir: str = os.getcwd()
+   # cut-offs for explicit solvent and point charges
+   # default values are taken for water from Skinner papers
+   cut_off1: float = 4.0
+   cut_off2: float = 7.831
 
    def createJobs(self):
      """
