@@ -142,7 +142,14 @@ class Mapbuilder:
 
    def write_Gaussian_input(self, su_xyz, sv_xyz, path):
       """
-         Gaussian DFT job
+         Gaussian DFT job:
+
+         Normal modes:
+         -------------
+         Freeze all solvent atoms, perform geometry optimization and frequency calculation
+        
+         iop(7/33=1) calculates transition dipole moments w.r.t. normal modes
+
       """      
       input_file = path/"input.com"
       atoms_to_ignore = self.solute[2]
@@ -150,7 +157,7 @@ class Mapbuilder:
 
       with open(input_file,"w") as f:
          f.write(f"%nprocshared={self.ncores}\n")
-         f.write(f"# Opt Freq {self.method}/{self.basis} NoSymm Int=Ultrafine SCF=tight Test\n")
+         f.write(f"# Opt Freq {self.method}/{self.basis} iop(7/33=1) NoSymm Int=Ultrafine SCF=tight Test\n")
          f.write(" \n")
          f.write(f"{self.solute[0]} in solvent \n")
          f.write(" \n")
