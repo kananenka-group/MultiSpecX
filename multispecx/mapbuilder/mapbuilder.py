@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from dataclasses import dataclass, field
 
-from .util import check_order, check_4site_water
+from .util import check_order, check_4site_water, rotation_matrix
 
 import mdtraj as md
 
@@ -207,6 +207,16 @@ class Mapbuilder:
          if item[0] == "align":
             atomn = item[1]-1
             atomp = item[2]-1
-            axis  = item[3]
-             
+            va = solu_xyz_t[atomp,:] - solu_xyz_t[atomn,:]
+            if item[3].lower() == "z":
+               vb = np.array([0.0,0.0,1.0])
+            elif item[3].lower() == "y":
+               vb = np.array([0.0,1.0,0.0])
+            elif item[3].lower() == "x":
+               vb = np.array([1.0,0.0,0.0])
+            else:
+               sys.exit(f" Cannot recognize rotation axis {item[3]} can only be 'x', 'y', or 'z'") 
+            Rot = rotation_matrix(va,vb) 
+            # rotate all atoms here ...
+            #print (np.dot(Rot,solu_xyz_t[atomp,:]), np.dot(Rot,solu_xyz_t[atomn,:]))
       return solu_xyz_t, solv_xyz_t
