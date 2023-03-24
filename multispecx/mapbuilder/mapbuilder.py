@@ -27,6 +27,9 @@ class Mapbuilder:
    # default values are taken for water from Skinner papers
    cut_off1: float = 4.0
    cut_off2: float = 7.831
+   # transform system:
+   transform: list = field(default_factory=[])
+   
 
    def createJobs(self):
      """
@@ -38,10 +41,11 @@ class Mapbuilder:
      t = md.load(self.xtc, top=self.gro)
      for frame in range(self.nframes):
         xyz = 10.0*t.xyz[frame,:,:]
-        solu_xyz = xyz[self.solu_ind,:]
-        solv_xyz = xyz[self.solv_ind,:]
+        solu_xyz_raw = xyz[self.solu_ind,:]
+        solv_xyz_raw = xyz[self.solv_ind,:]
 
-        # rotate here...
+        # transform here
+        solu_xyz, solv_xyz = self.transformXYZ(solu_xyz_raw, solv_xyz_raw)
 
         # calculate COM for solvent...
 
@@ -184,3 +188,18 @@ class Mapbuilder:
  
          f.write(" \n")
 
+   def transformXYZ(self, solu_xyz, solv_xyz):
+      """
+          Here input coordinates for the solute and solvent will be
+          transformed
+      """
+      solu_xyz_t = np.copy(solu_xyz)
+      solv_xyz_t = np.copy(solv_xyz)
+
+      for item in self.transform:
+         # center frame on a given atom
+         if item[0] == "center":
+            xyz_shift = solu_xyz[item[1],:]
+            solu_xyz_t -= xyz_shift
+            solv_xyz_t -= xyz_shift
+      return solu_xyz_t, solv_xyz_t
