@@ -47,7 +47,8 @@ class Mapbuilder:
         # transform here
         solu_xyz, solv_xyz = self.transformXYZ(solu_xyz_raw, solv_xyz_raw)
 
-        # calculate COM for solvent...
+        # calculate COM for each solvent and partition onto 2 groups:
+        # explicit or emplicit solvent
 
         # input file
         self.QC_input_file(solu_xyz, solv_xyz, frame)
@@ -198,13 +199,13 @@ class Mapbuilder:
 
       for item in self.transform:
          # center frame on a given atom
-         if item[0] == "center":
+         if item[0].lower() == "center":
             atom_center=item[1]-1
             xyz_shift = solu_xyz[atom_center,:]
             solu_xyz_t -= xyz_shift
             solv_xyz_t -= xyz_shift
          # align w.r.t particular axis
-         if item[0] == "align":
+         if item[0].lower() == "rotate":
             atomn = item[1]-1
             atomp = item[2]-1
             va = solu_xyz_t[atomp,:] - solu_xyz_t[atomn,:]
@@ -218,5 +219,8 @@ class Mapbuilder:
                sys.exit(f" Cannot recognize rotation axis {item[3]} can only be 'x', 'y', or 'z'") 
             Rot = rotation_matrix(va,vb) 
             # rotate all atoms here ...
-            #print (np.dot(Rot,solu_xyz_t[atomp,:]), np.dot(Rot,solu_xyz_t[atomn,:]))
+            for n in range(solu_xyz_t.shape[0]):
+               solu_xyz_t[n,:] = np.dot(Rot,solu_xyz_t[n,:])
+            for n in range(solv_xyz_t.shape[0]):
+               solv_xyz_t[n,:] = np.dot(Rot,solv_xyz_t[n,:])
       return solu_xyz_t, solv_xyz_t
