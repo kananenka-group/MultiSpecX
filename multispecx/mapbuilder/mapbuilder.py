@@ -203,4 +203,10 @@ class Mapbuilder:
             xyz_shift = solu_xyz[atom_center,:]
             solu_xyz_t -= xyz_shift
             solv_xyz_t -= xyz_shift
+         # align w.r.t particular axis
+         if item[0] == "align":
+            atomn = item[1]-1
+            atomp = item[2]-1
+            axis  = item[3]
+             
       return solu_xyz_t, solv_xyz_t
