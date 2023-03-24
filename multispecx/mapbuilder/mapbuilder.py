@@ -106,7 +106,9 @@ class Mapbuilder:
               if check_order(solv_atoms[:Msite_ind]+solv_atoms[Msite_ind+1:], self.chem_labels[n]):
                  solvent_atoms.append(solvent)
                  solvent_atoms.append(self.chem_labels[n])
-                 solvent_atoms.append(Msite_ind)
+                 ignore=[]
+                 ignore.append(Msite_ind)
+                 solvent_atoms.append(ignore)
                  print(f"      {solvent} is matched with the following atoms from {self.xyz[n]} file: {self.chem_labels[n]}")
         else:
            # just add like a normal solvent
@@ -155,8 +157,12 @@ class Mapbuilder:
 
       """      
       input_file = path/"input.com"
-      atoms_to_ignore = self.solute[2]
+      solute_atoms_to_ignore = self.solute[2]
       solute_atoms_list = iter(self.solute[1])
+
+      solvent_atoms_ignore = self.solvent[2]
+      solvent_atoms_list = iter(self.solvent[1])
+      n_solvent_mols = sv_xyz.shape[0] // (len(self.solvent[1])+len(self.solvent[2]))
 
       with open(input_file,"w") as f:
          f.write(f"%nprocshared={self.ncores}\n")
@@ -166,6 +172,9 @@ class Mapbuilder:
          f.write(" \n")
          f.write("0 1\n")
          for n in range(su_xyz.shape[0]):
-            if n not in atoms_to_ignore:
+            if n not in solute_atoms_to_ignore:
                f.write(f"  {next(solute_atoms_list)}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}\n")
+ 
+         
          f.write(" \n")
+
