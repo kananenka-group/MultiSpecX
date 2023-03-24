@@ -199,7 +199,8 @@ class Mapbuilder:
       for item in self.transform:
          # center frame on a given atom
          if item[0] == "center":
-            xyz_shift = solu_xyz[item[1],:]
+            atom_center=item[1]-1
+            xyz_shift = solu_xyz[atom_center,:]
             solu_xyz_t -= xyz_shift
             solv_xyz_t -= xyz_shift
       return solu_xyz_t, solv_xyz_t
