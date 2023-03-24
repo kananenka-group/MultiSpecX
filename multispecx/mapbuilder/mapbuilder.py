@@ -154,5 +154,5 @@ class Mapbuilder:
          f.write("0 1\n")
          for n in range(su_xyz.shape[0]):
             if n not in atoms_to_ignore:
-               f.write(f"  {self.solute[1][n]}   {su_xyz[n,0]}   {su_xyz[n,1]}   {su_xyz[n,2]}\n")
+               f.write(f"  {self.solute[1][n]}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}\n")
          f.write(" \n")
