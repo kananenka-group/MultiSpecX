@@ -152,7 +152,7 @@ class Mapbuilder:
          f.write(f"%nprocshared={self.ncores}\n")
          f.write(f"# Opt Freq {self.method}/{self.basis} NoSymm Int=Ultrafine SCF=tight Test\n")
          f.write(" \n")
-         f.write("comment line\n")
+         f.write(f"{self.solute[0]} in solvent \n")
          f.write(" \n")
          f.write("0 1\n")
          for n in range(su_xyz.shape[0]):
