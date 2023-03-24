@@ -161,8 +161,8 @@ class Mapbuilder:
       solute_atoms_list = iter(self.solute[1])
 
       solvent_atoms_ignore = self.solvent[2]
-      solvent_atoms_list = iter(self.solvent[1])
-      n_solvent_mols = sv_xyz.shape[0] // (len(self.solvent[1])+len(self.solvent[2]))
+      n_solvent_atoms = len(self.solvent[1])+len(self.solvent[2])
+      n_solvent_mols = sv_xyz.shape[0] // n_solvent_atoms
 
       with open(input_file,"w") as f:
          f.write(f"%nprocshared={self.ncores}\n")
@@ -175,6 +175,12 @@ class Mapbuilder:
             if n not in solute_atoms_to_ignore:
                f.write(f"  {next(solute_atoms_list)}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}\n")
  
-         
+         for n in range(n_solvent_mols):
+            solvent_atoms_list = iter(self.solvent[1])
+            for m in range(n_solvent_atoms):
+               atom_index=n_solvent_atoms*n+m
+               if m not in solvent_atoms_ignore:
+                  f.write(f"  {next(solvent_atoms_list)}   {sv_xyz[atom_index,0]:.4f}   {sv_xyz[atom_index,1]:.4f}   {sv_xyz[atom_index,2]:.4f}\n")
+ 
          f.write(" \n")
 
