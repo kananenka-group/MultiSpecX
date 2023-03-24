@@ -149,6 +149,9 @@ class Mapbuilder:
          Freeze all solvent atoms, perform geometry optimization and frequency calculation
         
          iop(7/33=1) calculates transition dipole moments w.r.t. normal modes
+                     output units are (km/mol)^1/2 read here
+                     https://mattermodeling.stackexchange.com/questions/5021/what-units-are-used-in-gaussian-16-for-dipole-derivatives-output
+                     to get it in [D A^(-1) u^(-1/2)] units divide by sqrt(42.2561)
 
       """      
       input_file = path/"input.com"
