@@ -174,7 +174,7 @@ class Mapbuilder:
          for n in range(su_xyz.shape[0]):
             if n not in solute_atoms_to_ignore:
                f.write(f"  {next(solute_atoms_list)}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}\n")
- 
+
          for n in range(n_solvent_mols):
             solvent_atoms_list = iter(self.solvent[1])
             for m in range(n_solvent_atoms):
