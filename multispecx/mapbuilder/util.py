@@ -2,21 +2,25 @@ import numpy as np
 
 def rotation_matrix(va, vb):
    """
-      Rotation matrix:
-      you want to find a rotation matrix R that rotates unit vector va onto unit vector vb
+      Generate rotation matrix:
+      find a rotation matrix R that rotates vector va onto vector vb
       
       The rotation matrix is given by:
       R = I + [v]x + [v]x^2*(1-c)/s^2
 
       where:
       ------
-      I is 3x3 identity matrix
-      [v]x is the skew-symmetric cross-product matrix of v which is a cross product of va and vb
-      c is a dot product of a and b (cosine of angle)
-      s is the magnitude of a cross product between a and b
-      [v]x is shown below (Vx) variable
+      I       -  3x3 identity matrix
+      [v]x    - the skew-symmetric cross-product matrix of v which is a cross product of va and vb
+      c       - a dot product of a and b (cosine of angle)
+      s       -  the magnitude of a cross product between a and b
+
+      [v]x    is (Vx) variable below
       1-c/s^2 can also be written as 1-c/s^2 = 1-c/(1-c^2) = 1/(1+c)
 
+      This approach works unless c=-1 which corresponds to
+      uva and uvb pointing in exactly opposite direction. This special
+      case is addressed below too
    """
    uva = va/np.linalg.norm(va)
    uvb = vb/np.linalg.norm(vb)
