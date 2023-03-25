@@ -230,8 +230,11 @@ class Mapbuilder:
       """
          Just print transformation operations to be applied
       """ 
+      if self.transform:
+         print(f">>>>> Coordinate transformation:")
+
       for item in self.transform:
          if item[0].lower() == "center":
-            print(f"      The frames will be translated to put atom {self.solute[1][item[1]-1]}({item[1]-1}) at the center of the box.")
+            print(f"      The frames will be translated to put atom {self.solute[1][item[1]-1]}({item[1]}) at the center of the box.")
          if item[0].lower() == "rotate":
             print(f"      The frames will be rotated such that vector {self.solute[1][item[1]-1]}({item[1]}) -> {self.solute[1][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
