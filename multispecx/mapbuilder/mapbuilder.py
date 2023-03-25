@@ -45,11 +45,12 @@ class Mapbuilder:
         solu_xyz_raw = xyz[self.solu_ind,:]
         solv_xyz_raw = xyz[self.solv_ind,:]
 
-        # determine COMs 
-        #self.COM(xyz, self.atoms, self.atoms_in_mol)
-
         # transform here
         solu_xyz, solv_xyz = self.transformXYZ(solu_xyz_raw, solv_xyz_raw)
+
+        # determine COMs 
+        # get another list of number of atoms in each solvent molecule
+        self.COM(solu_xyz, solv_xyz, self.mass_solu, self.mass_solv)
 
         # calculate COM for each solvent and partition onto 2 groups:
         # explicit or emplicit solvent
@@ -245,3 +246,22 @@ class Mapbuilder:
             print(f"      The frames will be translated to put atom {self.solute[1][item[1]-1]}({item[1]}) at the center of the box.")
          if item[0].lower() == "rotate":
             print(f"      The frames will be rotated such that vector {self.solute[1][item[1]-1]}({item[1]}) -> {self.solute[1][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
+
+   def COM(self, solu_xyz, solv_xyz, solu_mass, solv_mass):
+      """
+         Calculate center of mass for each molecule 
+      """
+      # solute
+      solu_com = np.zeros((3))
+      tmass=0
+      for n in range(solu_xyz.shape[0]):
+         solu_com[:] += solu_xyz[n,:]*solu_mass[n]
+         tmass += solu_mass[n]
+
+      solu_com /= tmass
+      
+      # solvent
+      
+
+
+     
