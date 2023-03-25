@@ -37,6 +37,7 @@ class Mapbuilder:
         input file for Qchem calculation
      """
      self.solute, self.solvent, self.solu_ind, self.solv_ind = self.extract_solute_solvent() 
+     self.print_transform_info()
 
      t = md.load(self.xtc, top=self.gro)
      for frame in range(self.nframes):
@@ -224,3 +225,13 @@ class Mapbuilder:
             for n in range(solv_xyz_t.shape[0]):
                solv_xyz_t[n,:] = np.dot(Rot,solv_xyz_t[n,:])
       return solu_xyz_t, solv_xyz_t
+
+   def print_transform_info(self):
+      """
+         Just print transformation operations to be applied
+      """ 
+      for item in self.transform:
+         if item[0].lower() == "center":
+            print(f"      The frames will be translated to put atom {self.solute[1][item[1]-1]}({item[1]-1}) at the center of the box.")
+         if item[0].lower() == "rotate":
+            print(f"      The frames will be rotated such that vector {self.solute[1][item[1]-1]}({item[1]}) -> {self.solute[1][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
