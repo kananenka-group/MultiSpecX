@@ -36,7 +36,7 @@ class Mapbuilder:
         Read snapshot from MD simulation, turn MD configuration into
         input file for Qchem calculation
      """
-     self.solute, self.solvent, self.solu_ind, self.solv_ind = self.extract_solute_solvent() 
+     self.solute, self.solvent, self.solu_ind, self.solv_ind, self.mass_solu, self.mass_solv = self.extract_solute_solvent() 
      self.print_transform_info()
 
      t = md.load(self.xtc, top=self.gro)
@@ -44,6 +44,9 @@ class Mapbuilder:
         xyz = 10.0*t.xyz[frame,:,:]
         solu_xyz_raw = xyz[self.solu_ind,:]
         solv_xyz_raw = xyz[self.solv_ind,:]
+
+        # determine COMs 
+        #self.COM(xyz, self.atoms, self.atoms_in_mol)
 
         # transform here
         solu_xyz, solv_xyz = self.transformXYZ(solu_xyz_raw, solv_xyz_raw)
@@ -130,8 +133,12 @@ class Mapbuilder:
      # this line below works for a single solvent, need to extend it in the future
      # to support more than one type of molecule in the environment
      solv_idx = [ int(atom[0])-1 for atom in self.atoms if atom[7] in solv_list]
+
+     # extract masses for COM calculations
+     mass_solu = [ float(atom[6]) for atom in self.atoms if atom[7] == s_resid ]
+     mass_solv = [ float(atom[6]) for atom in self.atoms if atom[7] in solv_list ]
      
-     return chem_labels_selected_mol, solvent_atoms, solu_idx, solv_idx
+     return chem_labels_selected_mol, solvent_atoms, solu_idx, solv_idx, mass_solu, mass_solv
 
      
    def QC_input_file(self, solute, solvent, frame):
@@ -217,7 +224,7 @@ class Mapbuilder:
             elif item[3].lower() == "x":
                vb = np.array([1.0,0.0,0.0])
             else:
-               sys.exit(f" Cannot recognize rotation axis {item[3]} can only be 'x', 'y', or 'z'") 
+               sys.exit(f" Cannot recognize the rotation axis {item[3]} can only be 'x', 'y', or 'z'") 
             Rot = rotation_matrix(va,vb) 
             # rotate all atoms here ...
             for n in range(solu_xyz_t.shape[0]):
