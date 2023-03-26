@@ -1,5 +1,8 @@
 import numpy as np
 
+def minImage(v, box):
+   return v - np.multiply(box,np.rint(np.divide(v,box)))
+
 def rotation_matrix(va, vb):
    """
       Generate rotation matrix:
