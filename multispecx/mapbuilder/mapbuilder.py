@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from dataclasses import dataclass, field
 
-from .util import check_order, check_4site_water, rotation_matrix
+from .util import check_order, check_4site_water, rotation_matrix, minImage
 
 import mdtraj as md
 
@@ -11,6 +11,9 @@ from ..system import *
 
 @dataclass
 class Mapbuilder:
+   solv_ref_atom: str
+   solu_ref_atom: str
+
    itp: list = field(default_factory=lambda: ['topol.itp'])
    gro:  str = "confout.gro" 
    xyz:  str = field(default_factory=lambda: ["solvent.xyz","solute.xyz"])
@@ -27,7 +30,6 @@ class Mapbuilder:
    # default values are taken for water from Skinner papers
    cut_off1: float = 4.0
    cut_off2: float = 7.831
-   # transform system:
    transform: list = field(default_factory=[])
    
 
@@ -42,18 +44,16 @@ class Mapbuilder:
      t = md.load(self.xtc, top=self.gro)
      for frame in range(self.nframes):
         xyz = 10.0*t.xyz[frame,:,:]
+        box = 10.0*t.unitcell_lengths[frame,:]
+
         solu_xyz_raw = xyz[self.solu_ind,:]
         solv_xyz_raw = xyz[self.solv_ind,:]
 
         # transform here
         solu_xyz, solv_xyz = self.transformXYZ(solu_xyz_raw, solv_xyz_raw)
 
-        # determine COMs 
-        # get another list of number of atoms in each solvent molecule
-        self.COM(solu_xyz, solv_xyz, self.mass_solu, self.mass_solv)
-
-        # calculate COM for each solvent and partition onto 2 groups:
         # explicit or emplicit solvent
+        solv_e, solv_p = self.SplitSolvent(solu_xyz, solv_xyz, box)
 
         # input file
         self.QC_input_file(solu_xyz, solv_xyz, frame)
@@ -83,9 +83,10 @@ class Mapbuilder:
         if len(self.chem_labels[n]) == self.atoms_in_mol[res_index]:
            if check_order(res_atoms, self.chem_labels[n]):
               chem_labels_selected_mol.append(s_resid)
+              chem_labels_selected_mol.append(res_atoms)
               chem_labels_selected_mol.append(self.chem_labels[n])
               chem_labels_selected_mol.append([])
-              print(f"      This molecule is matched with the following atoms from {self.xyz[n]} file: {chem_labels_selected_mol} ") 
+              print(f"      This molecule is matched with the following atoms from {self.xyz[n]} file: {chem_labels_selected_mol[2]} ") 
            else:
               sys.exit(f" Check order of atoms in xyz file for '{self.molecules[res_index][0]}' should be compatible with configuration file: {res_atoms}")
      if not chem_labels_selected_mol:
@@ -115,6 +116,7 @@ class Mapbuilder:
            for n in range(len(self.chem_labels)):
               if check_order(solv_atoms[:Msite_ind]+solv_atoms[Msite_ind+1:], self.chem_labels[n]):
                  solvent_atoms.append(solvent)
+                 solvent_atoms.append(solv_atoms)
                  solvent_atoms.append(self.chem_labels[n])
                  ignore=[]
                  ignore.append(Msite_ind)
@@ -125,6 +127,7 @@ class Mapbuilder:
            for n in range(len(self.chem_labels)):
               if check_order(solv_atoms, self.chem_labels[n]):
                  solvent_atoms.append(solvent)
+                 solvent_atoms.append(solv_atoms)
                  solvent_atoms.append(self.chem_labels[n])
                  solvent_atoms.append([])  
 
@@ -138,7 +141,8 @@ class Mapbuilder:
      # extract masses for COM calculations
      mass_solu = [ float(atom[6]) for atom in self.atoms if atom[7] == s_resid ]
      mass_solv = [ float(atom[6]) for atom in self.atoms if atom[7] in solv_list ]
-     
+    
+     # number of atoms in solvent molecule:
      return chem_labels_selected_mol, solvent_atoms, solu_idx, solv_idx, mass_solu, mass_solv
 
      
@@ -171,11 +175,11 @@ class Mapbuilder:
 
       """      
       input_file = path/"input.com"
-      solute_atoms_to_ignore = self.solute[2]
-      solute_atoms_list = iter(self.solute[1])
+      solute_atoms_to_ignore = self.solute[3]
+      solute_atoms_list = iter(self.solute[2])
 
-      solvent_atoms_ignore = self.solvent[2]
-      n_solvent_atoms = len(self.solvent[1])+len(self.solvent[2])
+      solvent_atoms_ignore = self.solvent[3]
+      n_solvent_atoms = len(self.solvent[1])
       n_solvent_mols = sv_xyz.shape[0] // n_solvent_atoms
 
       with open(input_file,"w") as f:
@@ -190,7 +194,7 @@ class Mapbuilder:
                f.write(f"  {next(solute_atoms_list)}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}\n")
 
          for n in range(n_solvent_mols):
-            solvent_atoms_list = iter(self.solvent[1])
+            solvent_atoms_list = iter(self.solvent[2])
             for m in range(n_solvent_atoms):
                atom_index=n_solvent_atoms*n+m
                if m not in solvent_atoms_ignore:
@@ -243,25 +247,35 @@ class Mapbuilder:
 
       for item in self.transform:
          if item[0].lower() == "center":
-            print(f"      The frames will be translated to put atom {self.solute[1][item[1]-1]}({item[1]}) at the center of the box.")
+            print(f"      The frames will be translated to put atom {self.solute[2][item[1]-1]}({item[1]}) at the center of the box.")
          if item[0].lower() == "rotate":
-            print(f"      The frames will be rotated such that vector {self.solute[1][item[1]-1]}({item[1]}) -> {self.solute[1][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
+            print(f"      The frames will be rotated such that vector {self.solute[2][item[1]-1]}({item[1]}) -> {self.solute[2][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
 
-   def COM(self, solu_xyz, solv_xyz, solu_mass, solv_mass):
+ 
+   def SplitSolvent(self, solu_xyz, solv_xyz, box):
       """
-         Calculate center of mass for each molecule 
+         Split solvent molecules into 2 groups:
+         - explicit solvent 
+         - solvent to be used as point charges
       """
-      # solute
-      solu_com = np.zeros((3))
-      tmass=0
-      for n in range(solu_xyz.shape[0]):
-         solu_com[:] += solu_xyz[n,:]*solu_mass[n]
-         tmass += solu_mass[n]
+      # find reference atoms
+      sura = self.solute[1].index(self.solu_ref_atom)
+      svra = self.solvent[1].index(self.solv_ref_atom)
+      n_solv_atoms = len(self.solvent[1])
+      n_solv_mols  = solv_xyz.shape[0] // n_solv_atoms
 
-      solu_com /= tmass
-      
-      # solvent
-      
+      sv_qm = []  
+      sv_pc = []
+      for n in range(n_solv_mols):
+         vnr = solv_xyz[n_solv_atoms*n+svra] - solu_xyz[sura,:]
+         vnn = minImage(vnr,box)      
+         dnn = np.sqrt(vnn.dot(vnn))
+         if dnn < self.cut_off2:
+            if dnn < self.cut_off1:
+               sv_qm.append(n)
+            else:
+               sv_pc.append(n)
 
+      return sv_qm, sv_pc
+             
 
-     
