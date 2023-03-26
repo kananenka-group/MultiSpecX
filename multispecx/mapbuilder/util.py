@@ -1,5 +1,10 @@
 import numpy as np
 
+def PBC(a_xyz,ref_xyz,box):
+   vv = ref_xyz - a_xyz
+   sv = vv - minImage(vv, box) 
+   return a_xyz + sv
+
 def minImage(v, box):
    return v - np.multiply(box,np.rint(np.divide(v,box)))
 

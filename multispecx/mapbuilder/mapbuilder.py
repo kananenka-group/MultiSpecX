@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from dataclasses import dataclass, field
 
-from .util import check_order, check_4site_water, rotation_matrix, minImage
+from .util import check_order, check_4site_water, rotation_matrix, minImage, PBC
 
 import mdtraj as md
 
@@ -53,10 +53,10 @@ class Mapbuilder:
         solu_xyz, solv_xyz = self.transformXYZ(solu_xyz_raw, solv_xyz_raw)
 
         # explicit or emplicit solvent
-        solv_e, solv_p = self.SplitSolvent(solu_xyz, solv_xyz, box)
+        solv_e, solv_p, ref_xyz = self.SplitSolvent(solu_xyz, solv_xyz, box)
 
         # input file
-        self.QC_input_file(solu_xyz, solv_xyz, frame)
+        self.QC_input_file(solu_xyz, solv_xyz, frame, solv_e, solv_p, box, ref_xyz)
 
    def extract_solute_solvent(self):
      # create a system object
@@ -91,7 +91,6 @@ class Mapbuilder:
               sys.exit(f" Check order of atoms in xyz file for '{self.molecules[res_index][0]}' should be compatible with configuration file: {res_atoms}")
      if not chem_labels_selected_mol:
         sys.exit(f" Cannot find the corresponding xyz file. ")
-
      
      print(f" >>>>> Looking for a solvent/environment.") 
      # check if we have more than just solute
@@ -146,7 +145,7 @@ class Mapbuilder:
      return chem_labels_selected_mol, solvent_atoms, solu_idx, solv_idx, mass_solu, mass_solv
 
      
-   def QC_input_file(self, solute, solvent, frame):
+   def QC_input_file(self, solute, solvent, frame, solv_e, solv_i, box, ref_xyz):
       """
          Here we will write an input file for electronic structure calculation
       """
@@ -154,13 +153,13 @@ class Mapbuilder:
       path.mkdir(parents=True, exist_ok=True)
 
       if self.software.lower() == "gaussian":
-         self.write_Gaussian_input(solute, solvent, path)
+         self.write_Gaussian_input(solute, solvent, path, solv_e, solv_i, box, ref_xyz)
       else:
          sys.exit(" Unrecognized option: software. At this time only Gaussian is supported")
 
 
 
-   def write_Gaussian_input(self, su_xyz, sv_xyz, path):
+   def write_Gaussian_input(self, su_xyz, sv_xyz, path, solv_e, solv_i, box, ref_xyz):
       """
          Gaussian DFT job:
 
@@ -193,13 +192,26 @@ class Mapbuilder:
             if n not in solute_atoms_to_ignore:
                f.write(f"  {next(solute_atoms_list)}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}\n")
 
-         for n in range(n_solvent_mols):
+         # explicit solvent
+         for n in solv_e:
             solvent_atoms_list = iter(self.solvent[2])
             for m in range(n_solvent_atoms):
                atom_index=n_solvent_atoms*n+m
                if m not in solvent_atoms_ignore:
-                  f.write(f"  {next(solvent_atoms_list)}   {sv_xyz[atom_index,0]:.4f}   {sv_xyz[atom_index,1]:.4f}   {sv_xyz[atom_index,2]:.4f}\n")
- 
+                  # correct through the box
+                  xyzC = PBC(sv_xyz[atom_index,:],ref_xyz,box)
+                  f.write(f"  {next(solvent_atoms_list)}   {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}\n")
+
+         # solvent as point charges include all
+         for n in solv_i:
+            solvent_atoms_list = iter(self.solvent[2])
+            for m in range(n_solvent_atoms):
+               atom_index=n_solvent_atoms*n+m
+               if m not in solvent_atoms_ignore:
+                  # correct through the box
+                  xyzC = PBC(sv_xyz[atom_index,:],ref_xyz,box)
+                  f.write(f"  {next(solvent_atoms_list)}   {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}\n")
+
          f.write(" \n")
 
    def transformXYZ(self, solu_xyz, solv_xyz):
@@ -276,6 +288,6 @@ class Mapbuilder:
             else:
                sv_pc.append(n)
 
-      return sv_qm, sv_pc
+      return sv_qm, sv_pc, solu_xyz[sura,:]
              
 
