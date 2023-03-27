@@ -190,7 +190,7 @@ class Mapbuilder:
          with open(input_file,"w") as f:
             f.write(f"%nprocshared={self.ncores}\n")
             f.write("%chk=freq\n")
-            f.write(f"#p Opt {self.method}/{self.basis} Charge=Angstroms NoSymm Int=Ultrafine SCF=tight Test\n")
+            f.write(f"#p Opt(MaxCycles=100,CalcFC) {self.method}/{self.basis} Charge=Angstroms NoSymm Int=Ultrafine SCF=tight Test\n")
             f.write(" \n")
             f.write(f"{self.solute[0]} in solvent \n")
             f.write(" \n")
