@@ -38,7 +38,7 @@ class Mapbuilder:
         Read snapshot from MD simulation, turn MD configuration into
         input file for Qchem calculation
      """
-     self.solute, self.solvent, self.solu_ind, self.solv_ind, self.mass_solu, self.mass_solv = self.extract_solute_solvent() 
+     self.solute, self.solvent, self.solu_ind, self.solv_ind, self.solv_charge = self.extract_solute_solvent() 
      self.print_transform_info()
 
      t = md.load(self.xtc, top=self.gro)
@@ -120,6 +120,7 @@ class Mapbuilder:
                  ignore=[]
                  ignore.append(Msite_ind)
                  solvent_atoms.append(ignore)
+                 # add solvent charges here...
                  print(f"      {solvent} is matched with the following atoms from {self.xyz[n]} file: {self.chem_labels[n]}")
         else:
            # just add like a normal solvent
@@ -137,12 +138,11 @@ class Mapbuilder:
      # to support more than one type of molecule in the environment
      solv_idx = [ int(atom[0])-1 for atom in self.atoms if atom[7] in solv_list]
 
-     # extract masses for COM calculations
-     mass_solu = [ float(atom[6]) for atom in self.atoms if atom[7] == s_resid ]
-     mass_solv = [ float(atom[6]) for atom in self.atoms if atom[7] in solv_list ]
-    
+     # get the charges
+     solv_charge = [ float(atom[5]) for atom in self.atoms if atom[7] in solv_list ]
+
      # number of atoms in solvent molecule:
-     return chem_labels_selected_mol, solvent_atoms, solu_idx, solv_idx, mass_solu, mass_solv
+     return chem_labels_selected_mol, solvent_atoms, solu_idx, solv_idx, solv_charge
 
      
    def QC_input_file(self, solute, solvent, frame, solv_e, solv_i, box, ref_xyz):
@@ -173,6 +173,9 @@ class Mapbuilder:
                      to get it in [D A^(-1) u^(-1/2)] units divide by sqrt(42.2561)
 
       """      
+      freeze = -1
+      nofreeze=0
+
       input_file = path/"input.com"
       solute_atoms_to_ignore = self.solute[3]
       solute_atoms_list = iter(self.solute[2])
@@ -190,7 +193,7 @@ class Mapbuilder:
          f.write("0 1\n")
          for n in range(su_xyz.shape[0]):
             if n not in solute_atoms_to_ignore:
-               f.write(f"  {next(solute_atoms_list)}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}\n")
+               f.write(f"  {next(solute_atoms_list)}   {nofreeze}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}\n")
 
          # explicit solvent
          for n in solv_e:
@@ -200,17 +203,16 @@ class Mapbuilder:
                if m not in solvent_atoms_ignore:
                   # correct through the box
                   xyzC = PBC(sv_xyz[atom_index,:],ref_xyz,box)
-                  f.write(f"  {next(solvent_atoms_list)}   {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}\n")
+                  f.write(f"  {next(solvent_atoms_list)}   {freeze}   {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}\n")
 
+         f.write(" \n")
          # solvent as point charges include all
          for n in solv_i:
-            solvent_atoms_list = iter(self.solvent[2])
             for m in range(n_solvent_atoms):
                atom_index=n_solvent_atoms*n+m
-               if m not in solvent_atoms_ignore:
-                  # correct through the box
-                  xyzC = PBC(sv_xyz[atom_index,:],ref_xyz,box)
-                  f.write(f"  {next(solvent_atoms_list)}   {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}\n")
+               # correct through the box
+               xyzC = PBC(sv_xyz[atom_index,:],ref_xyz,box)
+               f.write(f"  {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}   {self.solv_charge[atom_index]:.4f} \n")
 
          f.write(" \n")
 
