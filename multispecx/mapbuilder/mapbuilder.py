@@ -186,7 +186,8 @@ class Mapbuilder:
 
       with open(input_file,"w") as f:
          f.write(f"%nprocshared={self.ncores}\n")
-         f.write(f"# Opt Freq {self.method}/{self.basis} iop(7/33=1) NoSymm Int=Ultrafine SCF=tight Test\n")
+         f.write("%chk=freq\n")
+         f.write(f"#p Opt {self.method}/{self.basis} Charge NoSymm Int=Ultrafine SCF=tight Test\n")
          f.write(" \n")
          f.write(f"{self.solute[0]} in solvent \n")
          f.write(" \n")
@@ -215,6 +216,11 @@ class Mapbuilder:
                f.write(f"  {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}   {self.solv_charge[atom_index]:.4f} \n")
 
          f.write(" \n")
+         f.write("--Link1--\n")
+         f.write(f"%nprocshared={self.ncores}\n")
+         f.write("%chk=freq\n")
+         f.write(f"#p Freq {self.method} ChkBasis iop(7/33=1) Charge=Check Geom=AllCheck Guess=Read NoSymm Int=Ultrafine SCF=tight Test\n")
+         f.write(" \n") 
 
    def transformXYZ(self, solu_xyz, solv_xyz):
       """
