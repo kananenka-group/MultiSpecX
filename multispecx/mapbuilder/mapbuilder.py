@@ -184,43 +184,50 @@ class Mapbuilder:
       n_solvent_atoms = len(self.solvent[1])
       n_solvent_mols = sv_xyz.shape[0] // n_solvent_atoms
 
-      with open(input_file,"w") as f:
-         f.write(f"%nprocshared={self.ncores}\n")
-         f.write("%chk=freq\n")
-         f.write(f"#p Opt {self.method}/{self.basis} Charge=Angstroms NoSymm Int=Ultrafine SCF=tight Test\n")
-         f.write(" \n")
-         f.write(f"{self.solute[0]} in solvent \n")
-         f.write(" \n")
-         f.write("0 1\n")
-         for n in range(su_xyz.shape[0]):
-            if n not in solute_atoms_to_ignore:
-               f.write(f"  {next(solute_atoms_list)}   {nofreeze}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}\n")
+      # calculation type 1 normal modes
+      #
+      if self.vib.lower() == "normal":
+         with open(input_file,"w") as f:
+            f.write(f"%nprocshared={self.ncores}\n")
+            f.write("%chk=freq\n")
+            f.write(f"#p Opt {self.method}/{self.basis} Charge=Angstroms NoSymm Int=Ultrafine SCF=tight Test\n")
+            f.write(" \n")
+            f.write(f"{self.solute[0]} in solvent \n")
+            f.write(" \n")
+            f.write("0 1\n")
+            for n in range(su_xyz.shape[0]):
+               if n not in solute_atoms_to_ignore:
+                  f.write(f"  {next(solute_atoms_list)}   {nofreeze}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}\n")
 
-         # explicit solvent
-         for n in solv_e:
-            solvent_atoms_list = iter(self.solvent[2])
-            for m in range(n_solvent_atoms):
-               atom_index=n_solvent_atoms*n+m
-               if m not in solvent_atoms_ignore:
+            # explicit solvent
+            for n in solv_e:
+               solvent_atoms_list = iter(self.solvent[2])
+               for m in range(n_solvent_atoms):
+                  atom_index=n_solvent_atoms*n+m
+                  if m not in solvent_atoms_ignore:
+                     # correct through the box
+                     xyzC = PBC(sv_xyz[atom_index,:],ref_xyz,box)
+                     f.write(f"  {next(solvent_atoms_list)}   {freeze}   {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}\n")
+
+            f.write(" \n")
+            # solvent as point charges include all
+            for n in solv_i:
+               for m in range(n_solvent_atoms):
+                  atom_index=n_solvent_atoms*n+m
                   # correct through the box
                   xyzC = PBC(sv_xyz[atom_index,:],ref_xyz,box)
-                  f.write(f"  {next(solvent_atoms_list)}   {freeze}   {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}\n")
+                  f.write(f"  {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}   {self.solv_charge[atom_index]:.4f} \n")
 
-         f.write(" \n")
-         # solvent as point charges include all
-         for n in solv_i:
-            for m in range(n_solvent_atoms):
-               atom_index=n_solvent_atoms*n+m
-               # correct through the box
-               xyzC = PBC(sv_xyz[atom_index,:],ref_xyz,box)
-               f.write(f"  {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}   {self.solv_charge[atom_index]:.4f} \n")
-
-         f.write(" \n")
-         f.write("--Link1--\n")
-         f.write(f"%nprocshared={self.ncores}\n")
-         f.write("%chk=freq\n")
-         f.write(f"#p Freq {self.method} ChkBasis iop(7/33=1) Charge=Check Geom=AllCheck Guess=Read NoSymm Int=Ultrafine SCF=tight Test\n")
-         f.write(" \n") 
+            f.write(" \n")
+            f.write("--Link1--\n")
+            f.write(f"%nprocshared={self.ncores}\n")
+            f.write("%chk=freq\n")
+            f.write(f"#p Freq {self.method} ChkBasis iop(7/33=1) Charge=Check Geom=AllCheck Guess=Read NoSymm Int=Ultrafine SCF=tight Test\n")
+            f.write(" \n") 
+      elif self.vib.lower() == "local":
+         sys.exit(" Local mode calculations have not been implemented.")
+      else:
+         sys.exit(f" Unrecognized vib option: {self.vib}.")    
 
    def transformXYZ(self, solu_xyz, solv_xyz):
       """
