@@ -189,6 +189,7 @@ class Mapbuilder:
       #
       if self.vib.lower() == "normal":
          with open(input_file,"w") as f:
+            # Step 1. Geometry optimization without point charges
             f.write(f"%nprocshared={self.ncores}\n")
             f.write("%chk=freq\n")
             f.write(f"#p Opt(MaxCycles={self.opt_cycles},CalcFC) {self.method}/{self.basis} Charge=Angstroms NoSymm Int=Ultrafine SCF=tight Test\n")
@@ -200,7 +201,6 @@ class Mapbuilder:
                if n not in solute_atoms_to_ignore:
                   f.write(f"  {next(solute_atoms_list)}   {nofreeze}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}\n")
 
-            # explicit solvent
             for n in solv_e:
                solvent_atoms_list = iter(self.solvent[2])
                for m in range(n_solvent_atoms):
@@ -209,9 +209,18 @@ class Mapbuilder:
                      # correct through the box
                      xyzC = PBC(sv_xyz[atom_index,:],ref_xyz,box)
                      f.write(f"  {next(solvent_atoms_list)}   {freeze}   {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}\n")
-
             f.write(" \n")
-            # solvent as point charges include all
+            #
+            # Step 2. Geometry optimizaion with point charges added
+            #
+            f.write("--Link1--\n")
+            f.write(f"%nprocshared={self.ncores}\n")
+            f.write("%chk=freq\n")
+            f.write(f"#p Opt {self.method} ChkBasis Charge Geom=Check Guess=Read NoSymm Int=Ultrafine SCF=tight Test\n")
+            f.write(" \n") 
+            f.write(" adding point charges\n")
+            f.write(" \n")
+
             for n in solv_i:
                for m in range(n_solvent_atoms):
                   atom_index=n_solvent_atoms*n+m
