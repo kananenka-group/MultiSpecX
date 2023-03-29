@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from dataclasses import dataclass, field
 
-from .util import check_order, check_4site_water, rotation_matrix, minImage, PBC
+from .util import check_order, check_4site_water, rotation_matrix, minImage, PBC, distance, inBox
 
 import mdtraj as md
 
@@ -43,6 +43,7 @@ class Mapbuilder:
      self.print_transform_info()
 
      t = md.load(self.xtc, top=self.gro)
+     ws_count=0
      for frame in range(self.nframes):
         xyz = 10.0*t.xyz[frame,:,:]
         box = 10.0*t.unitcell_lengths[frame,:]
@@ -50,14 +51,18 @@ class Mapbuilder:
         solu_xyz_raw = xyz[self.solu_ind,:]
         solv_xyz_raw = xyz[self.solv_ind,:]
 
-        # transform here
-        solu_xyz, solv_xyz = self.transformXYZ(solu_xyz_raw, solv_xyz_raw)
+        # center box on selected atom
+        solu_xyz, solv_xyz = self.centerBox(solu_xyz_raw, solv_xyz_raw, box)
 
         # explicit or emplicit solvent
-        solv_e, solv_p, ref_xyz = self.SplitSolvent(solu_xyz, solv_xyz, box)
+        solv_e_xyz, solv_p_xyz = self.SplitSolvent(solu_xyz, solv_xyz, box)
+        ws_count+=solv_e_xyz.shape[0]
+
+        # transform here
+        solu_xyzT, solv_e_xyzT, solv_p_xyzT = self.transformXYZ(solu_xyz, solv_e_xyz, solv_p_xyz, box)
 
         # input file
-        self.QC_input_file(solu_xyz, solv_xyz, frame, solv_e, solv_p, box, ref_xyz)
+        self.QC_input_file(solu_xyzT, solv_e_xyzT, solv_p_xyzT, frame)
 
    def extract_solute_solvent(self):
      # create a system object
@@ -146,7 +151,7 @@ class Mapbuilder:
      return chem_labels_selected_mol, solvent_atoms, solu_idx, solv_idx, solv_charge
 
      
-   def QC_input_file(self, solute, solvent, frame, solv_e, solv_i, box, ref_xyz):
+   def QC_input_file(self, solute, solvent1, solvent2, frame):
       """
          Here we will write an input file for electronic structure calculation
       """
@@ -154,13 +159,13 @@ class Mapbuilder:
       path.mkdir(parents=True, exist_ok=True)
 
       if self.software.lower() == "gaussian":
-         self.write_Gaussian_input(solute, solvent, path, solv_e, solv_i, box, ref_xyz)
+         self.write_Gaussian_input(solute, solvent1, solvent2, path)
       else:
          sys.exit(" Unrecognized option: software. At this time only Gaussian is supported")
 
 
 
-   def write_Gaussian_input(self, su_xyz, sv_xyz, path, solv_e, solv_i, box, ref_xyz):
+   def write_Gaussian_input(self, su_xyz, sv1_xyz, sv2_xyz, path):
       """
          Gaussian DFT job:
 
@@ -182,8 +187,6 @@ class Mapbuilder:
       solute_atoms_list = iter(self.solute[2])
 
       solvent_atoms_ignore = self.solvent[3]
-      n_solvent_atoms = len(self.solvent[1])
-      n_solvent_mols = sv_xyz.shape[0] // n_solvent_atoms
 
       # calculation type 1 normal modes
       #
@@ -192,68 +195,64 @@ class Mapbuilder:
             # Step 1. Geometry optimization without point charges
             f.write(f"%nprocshared={self.ncores}\n")
             f.write("%chk=freq\n")
-            f.write(f"#p Opt(MaxCycles={self.opt_cycles},CalcFC) {self.method}/{self.basis} Charge=Angstroms NoSymm Int=Ultrafine SCF=tight Test\n")
+            f.write("%mem=20Gb\n")
+            f.write(f"#p Opt(MaxCycles={self.opt_cycles}) freq oniom({self.method}/{self.basis}:amber) NoSymm \n")
             f.write(" \n")
             f.write(f"{self.solute[0]} in solvent \n")
             f.write(" \n")
-            f.write("0 1\n")
+            f.write("0 1 0 1 0 1\n")
+            # high-level
             for n in range(su_xyz.shape[0]):
                if n not in solute_atoms_to_ignore:
-                  f.write(f"  {next(solute_atoms_list)}   {nofreeze}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}\n")
+                  f.write(f"  {next(solute_atoms_list)}   {nofreeze}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}  H \n")
 
-            for n in solv_e:
+            for n in range(sv1_xyz.shape[0]):
                solvent_atoms_list = iter(self.solvent[2])
-               for m in range(n_solvent_atoms):
-                  atom_index=n_solvent_atoms*n+m
+               for m in range(sv1_xyz.shape[1]):
                   if m not in solvent_atoms_ignore:
-                     # correct through the box
-                     xyzC = PBC(sv_xyz[atom_index,:],ref_xyz,box)
-                     f.write(f"  {next(solvent_atoms_list)}   {freeze}   {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}\n")
+                     if m==0:
+                        atom="OW"
+                        charge=-1.04
+                     if m==1 or m==2:
+                        atom="HW"
+                        charge=0.52 
+                     f.write(f"  {next(solvent_atoms_list)}-{atom}-{charge}   {freeze}   {sv1_xyz[n,m,0]:.4f}   {sv1_xyz[n,m,1]:.4f}   {sv1_xyz[n,m,2]:.4f} H \n")
+            
+            #f.write(" \n")
+            # low-level
+            for n in range(sv2_xyz.shape[0]):
+               solvent_atoms_list = iter(self.solvent[2])
+               for m in range(sv2_xyz.shape[1]):
+                  if m not in solvent_atoms_ignore:
+                     if m==0:
+                        atom="OW"
+                        charge=-1.04
+                     if m==1 or m==2:
+                        atom="HW"
+                        charge=0.52
+                     f.write(f"  {next(solvent_atoms_list)}-{atom}-{charge}  {freeze} {sv2_xyz[n,m,0]:.4f}   {sv2_xyz[n,m,1]:.4f}   {sv2_xyz[n,m,2]:.4f} L \n")
+
             f.write(" \n")
-            #
-            # Step 2. Geometry optimizaion with point charges added
-            #
             f.write("--Link1--\n")
             f.write(f"%nprocshared={self.ncores}\n")
             f.write("%chk=freq\n")
-            f.write(f"#p Opt {self.method} ChkBasis Charge Geom=Check Guess=Read NoSymm Int=Ultrafine SCF=tight Test\n")
-            f.write(" \n") 
-            f.write(" adding point charges\n")
-            f.write(" \n")
-
-            for n in solv_i:
-               for m in range(n_solvent_atoms):
-                  atom_index=n_solvent_atoms*n+m
-                  # correct through the box
-                  xyzC = PBC(sv_xyz[atom_index,:],ref_xyz,box)
-                  f.write(f"  {xyzC[0]:.4f}   {xyzC[1]:.4f}   {xyzC[2]:.4f}   {self.solv_charge[atom_index]:.4f} \n")
-
-            f.write(" \n")
-            f.write("--Link1--\n")
-            f.write(f"%nprocshared={self.ncores}\n")
-            f.write("%chk=freq\n")
-            f.write(f"#p Freq {self.method} ChkBasis iop(7/33=1) Charge=Check Geom=AllCheck Guess=Read NoSymm Int=Ultrafine SCF=tight Test\n")
+            f.write(f"#p Freq {self.method} ChkBasis iop(7/33=1) Geom=AllCheck Guess=Read NoSymm \n")
             f.write(" \n") 
       elif self.vib.lower() == "local":
          sys.exit(" Local mode calculations have not been implemented.")
       else:
          sys.exit(f" Unrecognized vib option: {self.vib}.")    
 
-   def transformXYZ(self, solu_xyz, solv_xyz):
+   def transformXYZ(self, solu_xyz, solv_e_xyz, solv_p_xyz, box):
       """
           Here input coordinates for the solute and solvent will be
           transformed
       """
-      solu_xyz_t = np.copy(solu_xyz)
-      solv_xyz_t = np.copy(solv_xyz)
+      solu_xyz_t   = np.copy(solu_xyz)
+      solv_e_xyz_t = np.copy(solv_e_xyz)
+      solv_p_xyz_t = np.copy(solv_p_xyz)
 
       for item in self.transform:
-         # center frame on a given atom
-         if item[0].lower() == "center":
-            atom_center=item[1]-1
-            xyz_shift = solu_xyz[atom_center,:]
-            solu_xyz_t -= xyz_shift
-            solv_xyz_t -= xyz_shift
          # align w.r.t particular axis
          if item[0].lower() == "rotate":
             atomn = item[1]-1
@@ -270,10 +269,37 @@ class Mapbuilder:
             Rot = rotation_matrix(va,vb) 
             # rotate all atoms here ...
             for n in range(solu_xyz_t.shape[0]):
-               solu_xyz_t[n,:] = np.dot(Rot,solu_xyz_t[n,:])
-            for n in range(solv_xyz_t.shape[0]):
-               solv_xyz_t[n,:] = np.dot(Rot,solv_xyz_t[n,:])
-      return solu_xyz_t, solv_xyz_t
+               solu_xyz_t[n,:] = Rot.dot(solu_xyz_t[n,:])
+            for n in range(solv_e_xyz_t.shape[0]):
+               for m in range(solv_e_xyz_t.shape[1]):
+                  solv_e_xyz_t[n,m,:] = Rot.dot(solv_e_xyz_t[n,m,:])
+            for n in range(solv_p_xyz_t.shape[0]):
+               for m in range(solv_p_xyz_t.shape[1]):
+                  solv_p_xyz_t[n,m,:] = Rot.dot(solv_p_xyz_t[n,m,:])
+         # center frame on a given atom
+         if item[0].lower() == "center":
+            atom_center=item[1]-1
+            xyz_shift = solu_xyz[atom_center,:]
+            for n in range(solu_xyz_t.shape[0]):
+               solu_xyz_t[n,:] -= xyz_shift
+            for n in range(solv_e_xyz_t.shape[0]):
+               for m in range(solv_e_xyz_t.shape[1]):
+                  solv_e_xyz_t[n,m,:] -= xyz_shift
+            for n in range(solv_p_xyz_t.shape[0]):
+               for m in range(solv_p_xyz_t.shape[1]):
+                  solv_p_xyz_t[n,m,:] -= xyz_shift
+
+      # check the distance w.r.t ref atom before and after transformaton:
+      #for n in range(solu_xyz.shape[0]):
+      #   print (" solute ",n,np.abs(distance(solu_xyz[atom_center,:],solu_xyz[n,:],box) - distance(solu_xyz_t[atom_center,:],solu_xyz_t[n,:],box)))
+      #for n in range(solv_e_xyz.shape[0]):
+      #   for m in range(solv_e_xyz.shape[1]):
+      #      print (" solvent ",n,m,np.abs(distance(solu_xyz[atom_center,:],solv_e_xyz[n,m,:],box) - distance(solu_xyz_t[atom_center,:],solv_e_xyz_t[n,m,:],box)))
+      #for n in range(solv_p_xyz.shape[0]):
+      #   for m in range(solv_p_xyz.shape[1]):
+      #      print (" solvent ",n,m,np.abs(distance(solu_xyz[atom_center,:],solv_p_xyz[n,m,:],box) - distance(solu_xyz_t[atom_center,:],solv_p_xyz_t[n,m,:],box)))
+
+      return solu_xyz_t, solv_e_xyz_t, solv_p_xyz_t
 
    def print_transform_info(self):
       """
@@ -309,10 +335,27 @@ class Mapbuilder:
          dnn = np.sqrt(vnn.dot(vnn))
          if dnn < self.cut_off2:
             if dnn < self.cut_off1:
-               sv_qm.append(n)
+               sv_qm.append(solv_xyz[n_solv_atoms*n:n_solv_atoms*n+n_solv_atoms,:])
             else:
-               sv_pc.append(n)
+               sv_pc.append(solv_xyz[n_solv_atoms*n:n_solv_atoms*n+n_solv_atoms,:])
 
-      return sv_qm, sv_pc, solu_xyz[sura,:]
+      return np.asarray(sv_qm,dtype=np.float32), np.asarray(sv_pc,dtype=np.float32)
              
+   def centerBox(self, solu_xyz, solv_xyz, box):
+      """
+         Center box on the reference atom
+      """
+      su_xyz = np.copy(solu_xyz)
+      sv_xyz = np.copy(solv_xyz)
+
+      sura = self.solute[1].index(self.solu_ref_atom)
+      cbox = box/2
+
+      shift = solu_xyz[sura,:] - cbox
+      for n in range(solu_xyz.shape[0]):
+         su_xyz[n,:] = inBox(su_xyz[n,:]-shift,box)
+      for n in range(solv_xyz.shape[0]):
+         sv_xyz[n,:] = inBox(sv_xyz[n,:]-shift,box)
+
+      return su_xyz, sv_xyz         
 

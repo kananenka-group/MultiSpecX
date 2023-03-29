@@ -1,9 +1,21 @@
 import numpy as np
 
+def inBox(v, box):
+   vo = np.copy(v)
+   for n in range(v.shape[0]):
+     if vo[n] < 0.0:
+       vo[n] += box[n]
+     elif vo[n] > box[n]:
+       vo[n] -= box[n]
+   return vo
+
+def distance(xyz, xyz_ref, box):
+   return np.linalg.norm(minImage(xyz-xyz_ref,box))
+
 def PBC(a_xyz,ref_xyz,box):
-   vv = ref_xyz - a_xyz
-   sv = vv - minImage(vv, box) 
-   return a_xyz + sv
+   vv = a_xyz - ref_xyz 
+   sv = vv - np.multiply(box,np.rint(np.divide(vv,box)))
+   return ref_xyz + sv
 
 def minImage(v, box):
    return v - np.multiply(box,np.rint(np.divide(v,box)))
