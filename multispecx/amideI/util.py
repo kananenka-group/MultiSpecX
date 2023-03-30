@@ -7,8 +7,14 @@ def chargeGroupSt(atoms):
    allCg = [ x[4] for x in atoms ]
    allMo = [ x[9] for x in atoms ] 
    
-   #for mol_idx in allMo:
-   ddd
+   for mol_idx in range(1,len(allMo)):
+      if allMo[mol_idx] == allMo[mol_idx-1]:
+         if allCg[mol_idx] == allCg[mol_idx-1]:
+            continue
+         else:
+            chg.append(mol_idx)
+      else:
+         chg.append(mol_idx)
    return np.asarray(chg,dtype=int)
 
 def chromList(isotope_labels, search_unit, atoms, atoms_in_mol):
