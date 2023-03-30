@@ -242,14 +242,10 @@ class Mapbuilder:
          if item[0].lower() == "center":
             atom_center=item[1]-1
             xyz_shift = np.copy(solu_xyz_t[atom_center,:])
-            #for n in range(solu_xyz_t.shape[0]):
-            solu_xyz_t[:,:] = np.subtract(solu_xyz_t[:,:],xyz_shift)
-            #for n in range(solv_e_xyz_t.shape[0]):
-            #   for m in range(solv_e_xyz_t.shape[1]):
-            solv_e_xyz_t[:,:,:] = np.subtract(solv_e_xyz_t[:,:,:],xyz_shift)
-            #for n in range(solv_p_xyz_t.shape[0]):
-            #   for m in range(solv_p_xyz_t.shape[1]):
-            solv_p_xyz_t[:,:,:] = np.subtract(solv_p_xyz_t[:,:,:],xyz_shift)
+            if np.linalg.norm(xyz_shift) > 1.0e-4:
+               solu_xyz_t[:,:]     = np.subtract(solu_xyz_t[:,:],xyz_shift)
+               solv_e_xyz_t[:,:,:] = np.subtract(solv_e_xyz_t[:,:,:],xyz_shift)
+               solv_p_xyz_t[:,:,:] = np.subtract(solv_p_xyz_t[:,:,:],xyz_shift)
          # align w.r.t particular axis
          elif item[0].lower() == "rotate":
             atomn = item[1]-1
@@ -266,14 +262,15 @@ class Mapbuilder:
             Rot = rotation_matrix(va,vb) 
 
             # rotate all atoms here ...
-            for n in range(solu_xyz_t.shape[0]):
-               solu_xyz_t[n,:] = Rot.dot(solu_xyz_t[n,:])
-            for n in range(solv_e_xyz_t.shape[0]):
-               for m in range(solv_e_xyz_t.shape[1]):
-                  solv_e_xyz_t[n,m,:] = Rot.dot(solv_e_xyz_t[n,m,:])
-            for n in range(solv_p_xyz_t.shape[0]):
-               for m in range(solv_p_xyz_t.shape[1]):
-                  solv_p_xyz_t[n,m,:] = Rot.dot(solv_p_xyz_t[n,m,:])
+            if np.linalg.norm(Rot-np.eye(3)) > 1.0e-4:
+               for n in range(solu_xyz_t.shape[0]):
+                  solu_xyz_t[n,:] = Rot.dot(solu_xyz_t[n,:])
+               for n in range(solv_e_xyz_t.shape[0]):
+                  for m in range(solv_e_xyz_t.shape[1]):
+                     solv_e_xyz_t[n,m,:] = Rot.dot(solv_e_xyz_t[n,m,:])
+               for n in range(solv_p_xyz_t.shape[0]):
+                  for m in range(solv_p_xyz_t.shape[1]):
+                     solv_p_xyz_t[n,m,:] = Rot.dot(solv_p_xyz_t[n,m,:])
          else:
             sys.exit(" Cannot recognize this transformation operation {item}")
 

@@ -6,7 +6,7 @@ from multispecx import mapbuilder
 work_dir = "/Users/akanane/Documents/Research/ester"
 transform = [['center',2],['rotate',2,6,'x'],['rotate',2,1,'y']] 
 basis="6-311++G(d,p)"
-nframes=2
+nframes=1
 cut_off1=5.0
 cut_off2=8.5
 
