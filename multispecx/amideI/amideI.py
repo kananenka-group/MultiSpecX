@@ -4,12 +4,12 @@ from dataclasses import dataclass, field
 import mdtraj as md
 
 from ..system import *
-from .util import getIndex
+from .util import getIndex, chromList
 
 @dataclass
 class AmideI:
    type: list = field(default_factory=lambda: ['dipole'])
-   isotope_labels: list = field(default_factory=lambda: ['none'])
+   isotope_labels: list = field(default_factory=lambda: [])
    itp: list = field(default_factory=lambda: ['topol.itp'])
    amideI_unit: list = field(default_factory=lambda: ['C','O','N','H'])
    gro:  str = "confout.gro" 
@@ -28,34 +28,14 @@ class AmideI:
      self.atoms, self.molecules, self.atoms_in_mol, _, _ = s.read()
 
      # find indices of peptide groups in each molecule.
-     chrom_start_idx, amideI_list_idx, n_amideI_mol = self.chromList()
+     chrom_start_idx, amideI_list_idx, n_amideI_mol = chromList(self.isotope_labels, self.amideI_unit, self.atoms, self.atoms_in_mol)
      if not chrom_start_idx:
         print(f" Did not find any amide I groups like this: {self.amideI_unit}")
         sys.exit(" exiting...")
      else:
-        print(f"       Found {len(chrom_start_idx)} amide I {self.isotope_labels} chromophores: ")
+        print(f"       Found {len(chrom_start_idx)} amide I chromophores: ")
         [print (f"       {id} in {molid[0]} ") for (id,molid) in zip(n_amideI_mol,self.molecules) if id>0]
 
      # run loop over MD snapshots to get the Hamiltonian
      # 1. convert to numpy arrays for efficiency
 
-   def chromList(self):
-     print(f" >>>>> Searching amide I units defined as {self.amideI_unit} for residues {self.isotope_labels}")
-     res_num = [ x[1] for x in self.atoms ]
-     res_nam = [ x[2] for x in self.atoms ]
-     atm_nam = [ x[3] for x in self.atoms ]
-     ist=0
-     cind=[]
-     aIind=[]
-     nas=[]
-     for numa in self.atoms_in_mol:
-        cout, amd = getIndex(self.amideI_unit, self.isotope_labels, res_num[ist:ist+numa], res_nam[ist:ist+numa], atm_nam[ist:ist+numa])
-        aIind.append(amd)
-        nas.append(len(cout))
-        if cout:
-           cind.append(cout)
-        ist+=numa
-     return cind, aIind, nas
-         
-      
-         

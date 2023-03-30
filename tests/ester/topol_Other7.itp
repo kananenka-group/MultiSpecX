@@ -1,0 +1,172 @@
+;
+;	File 'topol_Other7.itp' was generated
+;	By user: unknown (24088)
+;	On host: hpclogin3.chtc.wisc.edu
+;	At date: Fri Mar 10 12:01:52 2023
+;
+;	This is a include topology file
+;
+;	Created by:
+;	                    :-) GROMACS - gmx pdb2gmx, 2022.5 (-:
+;	
+;	Executable:   /home/goonetilleke/gromacs-2022.5/installed/bin/gmx_mpi
+;	Data prefix:  /home/goonetilleke/gromacs-2022.5/installed
+;	Working dir:  /mnt/cephfs/scratch/goonetilleke/kwkk
+;	Command line:
+;	  gmx_mpi pdb2gmx -f kwkk.pdb -glu -ignh
+;	Force field was read from current directory or a relative path - path added.
+;
+
+[ moleculetype ]
+; Name            nrexcl
+Other7              3
+
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr     charge       mass  typeB    chargeB      massB
+; residue   1 POT rtp POT  q +1.0
+     1        POT      1    POT    POT      1          1    39.0983   ; qtot 1
+; residue   2 POT rtp POT  q +1.0
+     2        POT      2    POT    POT      2          1    39.0983   ; qtot 2
+; residue   3 POT rtp POT  q +1.0
+     3        POT      3    POT    POT      3          1    39.0983   ; qtot 3
+; residue   4 POT rtp POT  q +1.0
+     4        POT      4    POT    POT      4          1    39.0983   ; qtot 4
+; residue   5 POT rtp POT  q +1.0
+     5        POT      5    POT    POT      5          1    39.0983   ; qtot 5
+; residue   6 POT rtp POT  q +1.0
+     6        POT      6    POT    POT      6          1    39.0983   ; qtot 6
+; residue   7 POT rtp POT  q +1.0
+     7        POT      7    POT    POT      7          1    39.0983   ; qtot 7
+; residue   8 POT rtp POT  q +1.0
+     8        POT      8    POT    POT      8          1    39.0983   ; qtot 8
+; residue   9 POT rtp POT  q +1.0
+     9        POT      9    POT    POT      9          1    39.0983   ; qtot 9
+; residue  10 POT rtp POT  q +1.0
+    10        POT     10    POT    POT     10          1    39.0983   ; qtot 10
+; residue  11 POT rtp POT  q +1.0
+    11        POT     11    POT    POT     11          1    39.0983   ; qtot 11
+; residue  12 POT rtp POT  q +1.0
+    12        POT     12    POT    POT     12          1    39.0983   ; qtot 12
+; residue  13 POT rtp POT  q +1.0
+    13        POT     13    POT    POT     13          1    39.0983   ; qtot 13
+; residue  14 POT rtp POT  q +1.0
+    14        POT     14    POT    POT     14          1    39.0983   ; qtot 14
+; residue  15 POT rtp POT  q +1.0
+    15        POT     15    POT    POT     15          1    39.0983   ; qtot 15
+; residue  16 POT rtp POT  q +1.0
+    16        POT     16    POT    POT     16          1    39.0983   ; qtot 16
+; residue  17 POT rtp POT  q +1.0
+    17        POT     17    POT    POT     17          1    39.0983   ; qtot 17
+; residue  18 POT rtp POT  q +1.0
+    18        POT     18    POT    POT     18          1    39.0983   ; qtot 18
+; residue  19 POT rtp POT  q +1.0
+    19        POT     19    POT    POT     19          1    39.0983   ; qtot 19
+; residue  20 POT rtp POT  q +1.0
+    20        POT     20    POT    POT     20          1    39.0983   ; qtot 20
+; residue  21 POT rtp POT  q +1.0
+    21        POT     21    POT    POT     21          1    39.0983   ; qtot 21
+; residue  22 POT rtp POT  q +1.0
+    22        POT     22    POT    POT     22          1    39.0983   ; qtot 22
+; residue  23 POT rtp POT  q +1.0
+    23        POT     23    POT    POT     23          1    39.0983   ; qtot 23
+; residue  24 POT rtp POT  q +1.0
+    24        POT     24    POT    POT     24          1    39.0983   ; qtot 24
+; residue  25 POT rtp POT  q +1.0
+    25        POT     25    POT    POT     25          1    39.0983   ; qtot 25
+; residue  26 POT rtp POT  q +1.0
+    26        POT     26    POT    POT     26          1    39.0983   ; qtot 26
+; residue  27 POT rtp POT  q +1.0
+    27        POT     27    POT    POT     27          1    39.0983   ; qtot 27
+; residue  28 POT rtp POT  q +1.0
+    28        POT     28    POT    POT     28          1    39.0983   ; qtot 28
+; residue  29 POT rtp POT  q +1.0
+    29        POT     29    POT    POT     29          1    39.0983   ; qtot 29
+; residue  30 POT rtp POT  q +1.0
+    30        POT     30    POT    POT     30          1    39.0983   ; qtot 30
+; residue  31 POT rtp POT  q +1.0
+    31        POT     31    POT    POT     31          1    39.0983   ; qtot 31
+; residue  32 POT rtp POT  q +1.0
+    32        POT     32    POT    POT     32          1    39.0983   ; qtot 32
+; residue  33 POT rtp POT  q +1.0
+    33        POT     33    POT    POT     33          1    39.0983   ; qtot 33
+; residue  34 POT rtp POT  q +1.0
+    34        POT     34    POT    POT     34          1    39.0983   ; qtot 34
+; residue  35 POT rtp POT  q +1.0
+    35        POT     35    POT    POT     35          1    39.0983   ; qtot 35
+; residue  36 POT rtp POT  q +1.0
+    36        POT     36    POT    POT     36          1    39.0983   ; qtot 36
+; residue  37 POT rtp POT  q +1.0
+    37        POT     37    POT    POT     37          1    39.0983   ; qtot 37
+; residue  38 CLA rtp CLA  q -1.0
+    38        CLA     38    CLA    CLA     38         -1      35.45   ; qtot 36
+; residue  39 CLA rtp CLA  q -1.0
+    39        CLA     39    CLA    CLA     39         -1      35.45   ; qtot 35
+; residue  40 CLA rtp CLA  q -1.0
+    40        CLA     40    CLA    CLA     40         -1      35.45   ; qtot 34
+; residue  41 CLA rtp CLA  q -1.0
+    41        CLA     41    CLA    CLA     41         -1      35.45   ; qtot 33
+; residue  42 CLA rtp CLA  q -1.0
+    42        CLA     42    CLA    CLA     42         -1      35.45   ; qtot 32
+; residue  43 CLA rtp CLA  q -1.0
+    43        CLA     43    CLA    CLA     43         -1      35.45   ; qtot 31
+; residue  44 CLA rtp CLA  q -1.0
+    44        CLA     44    CLA    CLA     44         -1      35.45   ; qtot 30
+; residue  45 CLA rtp CLA  q -1.0
+    45        CLA     45    CLA    CLA     45         -1      35.45   ; qtot 29
+; residue  46 CLA rtp CLA  q -1.0
+    46        CLA     46    CLA    CLA     46         -1      35.45   ; qtot 28
+; residue  47 CLA rtp CLA  q -1.0
+    47        CLA     47    CLA    CLA     47         -1      35.45   ; qtot 27
+; residue  48 CLA rtp CLA  q -1.0
+    48        CLA     48    CLA    CLA     48         -1      35.45   ; qtot 26
+; residue  49 CLA rtp CLA  q -1.0
+    49        CLA     49    CLA    CLA     49         -1      35.45   ; qtot 25
+; residue  50 CLA rtp CLA  q -1.0
+    50        CLA     50    CLA    CLA     50         -1      35.45   ; qtot 24
+; residue  51 CLA rtp CLA  q -1.0
+    51        CLA     51    CLA    CLA     51         -1      35.45   ; qtot 23
+; residue  52 CLA rtp CLA  q -1.0
+    52        CLA     52    CLA    CLA     52         -1      35.45   ; qtot 22
+; residue  53 CLA rtp CLA  q -1.0
+    53        CLA     53    CLA    CLA     53         -1      35.45   ; qtot 21
+; residue  54 CLA rtp CLA  q -1.0
+    54        CLA     54    CLA    CLA     54         -1      35.45   ; qtot 20
+; residue  55 CLA rtp CLA  q -1.0
+    55        CLA     55    CLA    CLA     55         -1      35.45   ; qtot 19
+; residue  56 CLA rtp CLA  q -1.0
+    56        CLA     56    CLA    CLA     56         -1      35.45   ; qtot 18
+; residue  57 CLA rtp CLA  q -1.0
+    57        CLA     57    CLA    CLA     57         -1      35.45   ; qtot 17
+; residue  58 CLA rtp CLA  q -1.0
+    58        CLA     58    CLA    CLA     58         -1      35.45   ; qtot 16
+; residue  59 CLA rtp CLA  q -1.0
+    59        CLA     59    CLA    CLA     59         -1      35.45   ; qtot 15
+; residue  60 CLA rtp CLA  q -1.0
+    60        CLA     60    CLA    CLA     60         -1      35.45   ; qtot 14
+; residue  61 CLA rtp CLA  q -1.0
+    61        CLA     61    CLA    CLA     61         -1      35.45   ; qtot 13
+; residue  62 CLA rtp CLA  q -1.0
+    62        CLA     62    CLA    CLA     62         -1      35.45   ; qtot 12
+; residue  63 CLA rtp CLA  q -1.0
+    63        CLA     63    CLA    CLA     63         -1      35.45   ; qtot 11
+; residue  64 CLA rtp CLA  q -1.0
+    64        CLA     64    CLA    CLA     64         -1      35.45   ; qtot 10
+; residue  65 CLA rtp CLA  q -1.0
+    65        CLA     65    CLA    CLA     65         -1      35.45   ; qtot 9
+; residue  66 CLA rtp CLA  q -1.0
+    66        CLA     66    CLA    CLA     66         -1      35.45   ; qtot 8
+; residue  67 CLA rtp CLA  q -1.0
+    67        CLA     67    CLA    CLA     67         -1      35.45   ; qtot 7
+; residue  68 CLA rtp CLA  q -1.0
+    68        CLA     68    CLA    CLA     68         -1      35.45   ; qtot 6
+; residue  69 CLA rtp CLA  q -1.0
+    69        CLA     69    CLA    CLA     69         -1      35.45   ; qtot 5
+; residue  70 CLA rtp CLA  q -1.0
+    70        CLA     70    CLA    CLA     70         -1      35.45   ; qtot 4
+; residue 3876 POT rtp POT  q +1.0
+    71        POT   3876    POT    POT     71          1    39.0983   ; qtot 5
+; residue 3877 POT rtp POT  q +1.0
+    72        POT   3877    POT    POT     72          1    39.0983   ; qtot 6
+
+; Include Position restraint file
+

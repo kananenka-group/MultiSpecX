@@ -1,0 +1,43 @@
+;
+;	File 'topol_Other5.itp' was generated
+;	By user: unknown (24088)
+;	On host: hpclogin3.chtc.wisc.edu
+;	At date: Fri Mar 10 12:01:35 2023
+;
+;	This is a include topology file
+;
+;	Created by:
+;	                    :-) GROMACS - gmx pdb2gmx, 2022.5 (-:
+;	
+;	Executable:   /home/goonetilleke/gromacs-2022.5/installed/bin/gmx_mpi
+;	Data prefix:  /home/goonetilleke/gromacs-2022.5/installed
+;	Working dir:  /mnt/cephfs/scratch/goonetilleke/kwkk
+;	Command line:
+;	  gmx_mpi pdb2gmx -f kwkk.pdb -glu -ignh
+;	Force field was read from current directory or a relative path - path added.
+;
+
+[ moleculetype ]
+; Name            nrexcl
+Other5              3
+
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr     charge       mass  typeB    chargeB      massB
+; residue 1002 POT rtp POT  q +1.0
+     1        POT   1002    POT    POT      1          1    39.0983   ; qtot 1
+; residue 1003 POT rtp POT  q +1.0
+     2        POT   1003    POT    POT      2          1    39.0983   ; qtot 2
+; residue 1004 POT rtp POT  q +1.0
+     3        POT   1004    POT    POT      3          1    39.0983   ; qtot 3
+; residue 1005 POT rtp POT  q +1.0
+     4        POT   1005    POT    POT      4          1    39.0983   ; qtot 4
+; residue 1006 POT rtp POT  q +1.0
+     5        POT   1006    POT    POT      5          1    39.0983   ; qtot 5
+; residue 1007 POT rtp POT  q +1.0
+     6        POT   1007    POT    POT      6          1    39.0983   ; qtot 6
+
+; Include Position restraint file
+#ifdef POSRES
+#include "posre_Other5.itp"
+#endif
+
