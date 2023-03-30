@@ -233,6 +233,7 @@ class Mapbuilder:
           Here input coordinates for the solute and solvent will be
           transformed
       """
+      thresh=1.0e-4
       solu_xyz_t   = np.copy(solu_xyz)
       solv_e_xyz_t = np.copy(solv_e_xyz)
       solv_p_xyz_t = np.copy(solv_p_xyz)
@@ -275,14 +276,17 @@ class Mapbuilder:
             sys.exit(" Cannot recognize this transformation operation {item}")
 
       # check the distance w.r.t ref atom before and after transformaton:
-      #for n in range(solu_xyz.shape[0]):
-      #   print (" solute ",n,np.linalg.norm(solu_xyz[atom_center,:]-solu_xyz[n,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solu_xyz_t[n,:]))
-      #for n in range(solv_e_xyz.shape[0]):
-      #   for m in range(solv_e_xyz.shape[1]):
-      #      print (" solvent ",n,m,np.linalg.norm(solu_xyz[atom_center,:]-solv_e_xyz[n,m,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solv_e_xyz_t[n,m,:]))
-      #for n in range(solv_p_xyz.shape[0]):
-      #   for m in range(solv_p_xyz.shape[1]):
-      #      print (" solvent ",n,m,np.abs(distance(solu_xyz[atom_center,:],solv_p_xyz[n,m,:],box) - distance(solu_xyz_t[atom_center,:],solv_p_xyz_t[n,m,:],box)))
+      su_er = np.linalg.norm(solu_xyz[atom_center,:]-solu_xyz[:,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solu_xyz_t[:,:])
+      if np.max(np.abs(su_er)) > thresh:
+         sys.exit(f" Error with solvent coordinate transformation {su_er}")
+
+      sv_er1 = np.linalg.norm(solu_xyz[atom_center,:]-solv_e_xyz[:,:,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solv_e_xyz_t[:,:,:])
+      if np.max(np.abs(sv_er1)) > thresh:
+         sys.exit(f" Error with solvent coordinate transformation {sv_er1}")
+
+      sv_er2 = np.linalg.norm(solu_xyz[atom_center,:]-solv_p_xyz[:,:,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solv_p_xyz_t[:,:,:])
+      if np.max(np.abs(sv_er2)) > thresh:
+         sys.exit(f" Error with solvent coordinate transformation {sv_er2}")
 
       return solu_xyz_t, solv_e_xyz_t, solv_p_xyz_t
 
@@ -295,9 +299,9 @@ class Mapbuilder:
 
       for item in self.transform:
          if item[0].lower() == "center":
-            print(f"      The frames will be translated to put atom {self.solute[2][item[1]-1]}({item[1]}) at the center of the box.")
+            print(f"      The frames will be translated to put atom {self.solute[3][item[1]-1]}({item[1]}) at the center of the box.")
          if item[0].lower() == "rotate":
-            print(f"      The frames will be rotated such that vector {self.solute[2][item[1]-1]}({item[1]}) -> {self.solute[2][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
+            print(f"      The frames will be rotated such that vector {self.solute[3][item[1]-1]}({item[1]}) -> {self.solute[3][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
 
  
    def SplitSolvent(self, solu_xyz, solv_xyz, box):
