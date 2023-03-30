@@ -198,24 +198,29 @@ class Mapbuilder:
             f.write(f"%nprocshared={self.ncores}\n")
             f.write("%chk=job.chk\n")
             f.write("%mem=20Gb\n")
-            f.write(f"#p Opt(MaxCycles={self.opt_cycles},CalcFC) oniom({self.method}/{self.basis}:amber) NoSymm \n")
+            #f.write(f"#p Opt(MaxCycles={self.opt_cycles},CalcFC) oniom({self.method}/{self.basis}:amber) NoSymm \n")
+            f.write(f"#p Opt(MaxCycles={self.opt_cycles},CalcFC) {self.method}/{self.basis} \n")
             f.write(" \n")
             f.write(f"{self.solute[0]} in solvent \n")
             f.write(" \n")
-            f.write("0 1 0 1 0 1\n")
+            #f.write("0 1 0 1 0 1\n")
+            f.write("0 1\n")
             # high-level
+            #for n in range(su_xyz.shape[0]):
+            #   f.write(f"  {self.solute[3][n].upper()}-{self.solute[2][n].upper()}-{self.solu_charge[n]}   {nofreeze}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}  H \n")
             for n in range(su_xyz.shape[0]):
-               f.write(f"  {self.solute[3][n].upper()}-{self.solute[2][n].upper()}-{self.solu_charge[n]}   {nofreeze}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}  H \n")
+               f.write(f"  {self.solute[3][n].upper()}   {nofreeze}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}  \n")
 
             for n in range(sv1_xyz.shape[0]):
                for m in range(sv1_xyz.shape[1]):
-                  f.write(f"  {self.solvent[3][m].upper()}-{self.solvent[2][m].upper()}-{self.solv_charge[m]}   {freeze}   {sv1_xyz[n,m,0]:.4f}   {sv1_xyz[n,m,1]:.4f}   {sv1_xyz[n,m,2]:.4f} H \n")
+                  #f.write(f"  {self.solvent[3][m].upper()}-{self.solvent[2][m].upper()}-{self.solv_charge[m]}   {freeze}   {sv1_xyz[n,m,0]:.4f}   {sv1_xyz[n,m,1]:.4f}   {sv1_xyz[n,m,2]:.4f} H \n")
+                  f.write(f"  {self.solvent[3][m].upper()}   {freeze}   {sv1_xyz[n,m,0]:.4f}   {sv1_xyz[n,m,1]:.4f}   {sv1_xyz[n,m,2]:.4f} \n")
             
             #f.write(" \n")
             # low-level
-            for n in range(sv2_xyz.shape[0]):
-               for m in range(sv2_xyz.shape[1]):
-                  f.write(f"  {self.solvent[3][m].upper()}-{self.solvent[2][m].upper()}-{self.solv_charge[m]}  {freeze} {sv2_xyz[n,m,0]:.4f}   {sv2_xyz[n,m,1]:.4f}   {sv2_xyz[n,m,2]:.4f} L \n")
+            #for n in range(sv2_xyz.shape[0]):
+            #   for m in range(sv2_xyz.shape[1]):
+            #      f.write(f"  {self.solvent[3][m].upper()}-{self.solvent[2][m].upper()}-{self.solv_charge[m]}  {freeze} {sv2_xyz[n,m,0]:.4f}   {sv2_xyz[n,m,1]:.4f}   {sv2_xyz[n,m,2]:.4f} L \n")
 
             f.write(" \n")
             f.write("--Link1--\n")
