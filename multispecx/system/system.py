@@ -18,8 +18,8 @@ class System:
    def read(self,read_xyz=False):
       # reading topology file
       self.molecules, self.molnum = self.readTOP()
-      print (f" Found following molecules in {self.top_file} file")
-      [print(f" {line[0]}  {line[1]}") for line in self.molnum]
+      print (f"       Found following molecules in {self.top_file} file")
+      [print(f"       {line[0]}  {line[1]}") for line in self.molnum]
 
       # reading itp files
       self.molecule_list, self.molecule_find = self.readITP()
@@ -31,7 +31,7 @@ class System:
 
       # reading GRO file
       self.natoms, self.system = self.readGRO()
-      print (f" Total number of atoms: {self.natoms}")
+      print (f"       Total number of atoms: {self.natoms}")
 
       # do the match
       atoms_out, atoms_in_mol = self.match()
@@ -124,13 +124,13 @@ class System:
 
       if add_h:
           hf = list(set(h_labels))
-          print(f" {len(h_labels)} water hydrogen atoms were found, types={hf} and assigned mass {h_mass}")
+          print(f"       {len(h_labels)} water hydrogen atoms were found, types={hf} and assigned mass {h_mass}")
       if add_o:
           of = list(set(o_labels))
-          print(f" {len(o_labels)} water oxygen atoms were found, types={of} and assigned mass {o_mass}")
+          print(f"       {len(o_labels)} water oxygen atoms were found, types={of} and assigned mass {o_mass}")
       if add_m:
           mf = list(set(m_labels))
-          print(f" {len(m_labels)} water m-site atoms were found, types={mf} and assigned mass {m_mass}") 
+          print(f"       {len(m_labels)} water m-site atoms were found, types={mf} and assigned mass {m_mass}") 
 
       return atoms_info, atoms_in_mol
              

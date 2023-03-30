@@ -36,3 +36,12 @@ class Ester:
      cgS = chargeGroupSt(self.atoms)
 
      print(chrom_start_idx)
+
+     # loop over all frames
+     #t = md.load(self.xtc, top=self.gro)
+     #nframes = t.xyz.shape[0]
+
+     #printf(f">>>>>>> Reading frames from {self.xtc}, total number of frames = {nframes}")
+     #for frame in range(nframes):
+     #   xyz = 10.0*t.xyz[frame,:,:]
+     #   box = 10.0*t.unitcell_lengths[frame,:]
