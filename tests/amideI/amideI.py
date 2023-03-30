@@ -1,5 +1,5 @@
 import sys
-sys.path.append("..")
+sys.path.append("../..")
 from multispecx import spectrum
 from multispecx import amideI
 

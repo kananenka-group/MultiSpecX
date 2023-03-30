@@ -5,8 +5,8 @@ def chargeGroupSt(atoms):
       This function determines were each charge group starts.
    """
    chg = [0]
-   allCg = [ x[4] for x in atoms ]
-   allMo = [ x[9] for x in atoms ] 
+   allCg = [ x[5] for x in atoms ]
+   allMo = [ x[10] for x in atoms ] 
    
    for mol_idx in range(1,len(allMo)):
       if allMo[mol_idx] == allMo[mol_idx-1]:
@@ -25,9 +25,9 @@ def chromList(isotope_labels, search_unit, atoms, atoms_in_mol):
      else:
         print(f" >>>>> Searching {search_unit} in all residues")
 
-     res_num = [ x[1] for x in atoms ]
-     res_nam = [ x[2] for x in atoms ]
-     atm_nam = [ x[3] for x in atoms ]
+     res_num = [ x[2] for x in atoms ]
+     res_nam = [ x[3] for x in atoms ]
+     atm_nam = [ x[4] for x in atoms ]
      ist=0
      cind=[]
      aIind=[]

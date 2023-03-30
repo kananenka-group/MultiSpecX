@@ -4,7 +4,7 @@ sys.path.append("../..")
 from multispecx import mapbuilder
 
 work_dir = "/Users/akanane/Documents/Research/ester"
-transform = [['center',2],['rotate',2,6,'x'],['rotate',2,1,'y']]
+transform = [['center',2],['rotate',2,6,'x'],['rotate',2,1,'y']] 
 basis="6-311++G(d,p)"
 nframes=2
 cut_off1=5.0

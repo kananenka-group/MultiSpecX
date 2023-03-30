@@ -39,7 +39,7 @@ class Mapbuilder:
         Read snapshot from MD simulation, turn MD configuration into
         input file for Qchem calculation
      """
-     self.solute, self.solvent, self.solu_ind, self.solv_ind, self.solv_charge = self.extract_solute_solvent() 
+     self.solute, self.solvent, self.solu_ind, self.solv_ind, self.solv_charge, self.solu_charge = self.extract_solute_solvent() 
      self.print_transform_info()
 
      t = md.load(self.xtc, top=self.gro)
@@ -76,23 +76,23 @@ class Mapbuilder:
      if res_num.count("1") == 1:
         res_index = res_num.index("1")
         s_resid = self.molecules[res_index][0]
-        print(f"      The following molecule has been found: {s_resid}")
+        print(f"       The following molecule has been found: {s_resid}")
      else:
         sys.exit(f" In the current implementation MapBuilder can only do 1 molecule in a solvent but you have: {self.molecules} ")
 
      # find which molecules from xyz files matches 
-     # note that this can also be 4-site water so, later, we would
-     # need to incorporate this functionality.
      chem_labels_selected_mol=[]
-     res_atoms = [x[2] for x in self.molecule_list[res_index]]
+     res_atoms  = [x[3] for x in self.molecule_list[res_index]]
+     atom_types = [x[0] for x in self.molecule_list[res_index]]
      for n in range(len(self.chem_labels)):
         if len(self.chem_labels[n]) == self.atoms_in_mol[res_index]:
            if check_order(res_atoms, self.chem_labels[n]):
               chem_labels_selected_mol.append(s_resid)
               chem_labels_selected_mol.append(res_atoms)
+              chem_labels_selected_mol.append(atom_types)
               chem_labels_selected_mol.append(self.chem_labels[n])
-              chem_labels_selected_mol.append([])
-              print(f"      This molecule is matched with the following atoms from {self.xyz[n]} file: {chem_labels_selected_mol[2]} ") 
+              #chem_labels_selected_mol.append([])
+              print(f"       This molecule is matched with the following atoms from {self.xyz[n]} file: {chem_labels_selected_mol[2]} ") 
            else:
               sys.exit(f" Check order of atoms in xyz file for '{self.molecules[res_index][0]}' should be compatible with configuration file: {res_atoms}")
      if not chem_labels_selected_mol:
@@ -104,7 +104,7 @@ class Mapbuilder:
 
      # loop over all molecules looking for a solvent
      solv_list = [val[0] for x, val in enumerate(self.molecules) if val[0] not in s_resid ]
-     print(f"      The following molecules were found: {solv_list}") 
+     print(f"       The following molecules were found: {solv_list}") 
 
      # find q chem representation of all solvent molecules
      assert len(solv_list) == 1, f"  So far only one molecule type can be solvent (more complex envirnments will be implemened in the future"
@@ -114,10 +114,12 @@ class Mapbuilder:
      solvent_atoms=[]
      for solvent in solv_list:
         solv_index = res_names.index(solvent)
-        solv_atoms = [ x[2] for x in self.molecule_list[solv_index] ] 
+        solv_atoms = [ x[3] for x in self.molecule_list[solv_index] ] 
+        solv_atom_types = [ x[0] for x in self.molecule_list[solv_index] ] 
         Msite_ind = check_4site_water(solv_atoms, s.msite_list)
         if Msite_ind > 0:
            print (f"      {solvent} appears to be 4-site water: {solv_atoms}.")
+           sys.exit(" Error! Since so far only ONIOM with amber FF has been implemented it is not clear how to map dummy atoms to real ones.\n Use TIP3P or SPC water.")
            for n in range(len(self.chem_labels)):
               if check_order(solv_atoms[:Msite_ind]+solv_atoms[Msite_ind+1:], self.chem_labels[n]):
                  solvent_atoms.append(solvent)
@@ -134,21 +136,25 @@ class Mapbuilder:
               if check_order(solv_atoms, self.chem_labels[n]):
                  solvent_atoms.append(solvent)
                  solvent_atoms.append(solv_atoms)
+                 solvent_atoms.append(solv_atom_types)
                  solvent_atoms.append(self.chem_labels[n])
-                 solvent_atoms.append([])  
+                 #solvent_atoms.append([])  
 
      # find out indices of solute and solvent in the configuration 
-     solu_idx = [ int(atom[0])-1 for atom in self.atoms if atom[7] == s_resid]
+     solu_idx = [ int(atom[0])-1 for atom in self.atoms if atom[8] == s_resid]
 
      # this line below works for a single solvent, need to extend it in the future
      # to support more than one type of molecule in the environment
-     solv_idx = [ int(atom[0])-1 for atom in self.atoms if atom[7] in solv_list]
+     solv_idx = [ int(atom[0])-1 for atom in self.atoms if atom[8] in solv_list]
 
-     # get the charges
-     solv_charge = [ float(atom[5]) for atom in self.atoms if atom[7] in solv_list ]
+     # get solvent charges
+     solv_charge = [ float(atom[6]) for atom in self.atoms if atom[8] in solv_list ]
+
+     # get solute charges
+     solu_charge = [ float(atom[6]) for atom in self.atoms if atom[8] == s_resid ]
 
      # number of atoms in solvent molecule:
-     return chem_labels_selected_mol, solvent_atoms, solu_idx, solv_idx, solv_charge
+     return chem_labels_selected_mol, solvent_atoms, solu_idx, solv_idx, solv_charge, solu_charge
 
      
    def QC_input_file(self, solute, solvent1, solvent2, frame):
@@ -183,10 +189,6 @@ class Mapbuilder:
       nofreeze=0
 
       input_file = path/"input.com"
-      solute_atoms_to_ignore = self.solute[3]
-      solute_atoms_list = iter(self.solute[2])
-
-      solvent_atoms_ignore = self.solvent[3]
 
       # calculation type 1 normal modes
       #
@@ -194,48 +196,31 @@ class Mapbuilder:
          with open(input_file,"w") as f:
             # Step 1. Geometry optimization without point charges
             f.write(f"%nprocshared={self.ncores}\n")
-            f.write("%chk=freq\n")
+            f.write("%chk=job.chk\n")
             f.write("%mem=20Gb\n")
-            f.write(f"#p Opt(MaxCycles={self.opt_cycles}) freq oniom({self.method}/{self.basis}:amber) NoSymm \n")
+            f.write(f"#p Opt(MaxCycles={self.opt_cycles}) oniom({self.method}/{self.basis}:amber) NoSymm \n")
             f.write(" \n")
             f.write(f"{self.solute[0]} in solvent \n")
             f.write(" \n")
             f.write("0 1 0 1 0 1\n")
             # high-level
             for n in range(su_xyz.shape[0]):
-               if n not in solute_atoms_to_ignore:
-                  f.write(f"  {next(solute_atoms_list)}   {nofreeze}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}  H \n")
+               f.write(f"  {self.solute[3][n].upper()}-{self.solute[2][n].upper()}-{self.solu_charge[n]}   {nofreeze}   {su_xyz[n,0]:.4f}   {su_xyz[n,1]:.4f}   {su_xyz[n,2]:.4f}  H \n")
 
             for n in range(sv1_xyz.shape[0]):
-               solvent_atoms_list = iter(self.solvent[2])
                for m in range(sv1_xyz.shape[1]):
-                  if m not in solvent_atoms_ignore:
-                     if m==0:
-                        atom="OW"
-                        charge=-1.04
-                     if m==1 or m==2:
-                        atom="HW"
-                        charge=0.52 
-                     f.write(f"  {next(solvent_atoms_list)}-{atom}-{charge}   {freeze}   {sv1_xyz[n,m,0]:.4f}   {sv1_xyz[n,m,1]:.4f}   {sv1_xyz[n,m,2]:.4f} H \n")
+                  f.write(f"  {self.solvent[3][m].upper()}-{self.solvent[2][m].upper()}-{self.solv_charge[m]}   {freeze}   {sv1_xyz[n,m,0]:.4f}   {sv1_xyz[n,m,1]:.4f}   {sv1_xyz[n,m,2]:.4f} H \n")
             
             #f.write(" \n")
             # low-level
             for n in range(sv2_xyz.shape[0]):
-               solvent_atoms_list = iter(self.solvent[2])
                for m in range(sv2_xyz.shape[1]):
-                  if m not in solvent_atoms_ignore:
-                     if m==0:
-                        atom="OW"
-                        charge=-1.04
-                     if m==1 or m==2:
-                        atom="HW"
-                        charge=0.52
-                     f.write(f"  {next(solvent_atoms_list)}-{atom}-{charge}  {freeze} {sv2_xyz[n,m,0]:.4f}   {sv2_xyz[n,m,1]:.4f}   {sv2_xyz[n,m,2]:.4f} L \n")
+                  f.write(f"  {self.solvent[3][m].upper()}-{self.solvent[2][m].upper()}-{self.solv_charge[m]}  {freeze} {sv2_xyz[n,m,0]:.4f}   {sv2_xyz[n,m,1]:.4f}   {sv2_xyz[n,m,2]:.4f} L \n")
 
             f.write(" \n")
             f.write("--Link1--\n")
             f.write(f"%nprocshared={self.ncores}\n")
-            f.write("%chk=freq\n")
+            f.write("%chk=job.chk\n")
             f.write(f"#p Freq {self.method} ChkBasis iop(7/33=1) Geom=AllCheck Guess=Read NoSymm \n")
             f.write(" \n") 
       elif self.vib.lower() == "local":
@@ -253,11 +238,23 @@ class Mapbuilder:
       solv_p_xyz_t = np.copy(solv_p_xyz)
 
       for item in self.transform:
+         # center frame on a given atom
+         if item[0].lower() == "center":
+            atom_center=item[1]-1
+            xyz_shift = np.copy(solu_xyz_t[atom_center,:])
+            #for n in range(solu_xyz_t.shape[0]):
+            solu_xyz_t[:,:] = np.subtract(solu_xyz_t[:,:],xyz_shift)
+            #for n in range(solv_e_xyz_t.shape[0]):
+            #   for m in range(solv_e_xyz_t.shape[1]):
+            solv_e_xyz_t[:,:,:] = np.subtract(solv_e_xyz_t[:,:,:],xyz_shift)
+            #for n in range(solv_p_xyz_t.shape[0]):
+            #   for m in range(solv_p_xyz_t.shape[1]):
+            solv_p_xyz_t[:,:,:] = np.subtract(solv_p_xyz_t[:,:,:],xyz_shift)
          # align w.r.t particular axis
-         if item[0].lower() == "rotate":
+         elif item[0].lower() == "rotate":
             atomn = item[1]-1
             atomp = item[2]-1
-            va = solu_xyz_t[atomp,:] - solu_xyz_t[atomn,:]
+            va = np.subtract(solu_xyz_t[atomp,:],solu_xyz_t[atomn,:])
             if item[3].lower() == "z":
                vb = np.array([0.0,0.0,1.0])
             elif item[3].lower() == "y":
@@ -267,6 +264,7 @@ class Mapbuilder:
             else:
                sys.exit(f" Cannot recognize the rotation axis {item[3]} can only be 'x', 'y', or 'z'") 
             Rot = rotation_matrix(va,vb) 
+
             # rotate all atoms here ...
             for n in range(solu_xyz_t.shape[0]):
                solu_xyz_t[n,:] = Rot.dot(solu_xyz_t[n,:])
@@ -276,25 +274,15 @@ class Mapbuilder:
             for n in range(solv_p_xyz_t.shape[0]):
                for m in range(solv_p_xyz_t.shape[1]):
                   solv_p_xyz_t[n,m,:] = Rot.dot(solv_p_xyz_t[n,m,:])
-         # center frame on a given atom
-         if item[0].lower() == "center":
-            atom_center=item[1]-1
-            xyz_shift = solu_xyz[atom_center,:]
-            for n in range(solu_xyz_t.shape[0]):
-               solu_xyz_t[n,:] -= xyz_shift
-            for n in range(solv_e_xyz_t.shape[0]):
-               for m in range(solv_e_xyz_t.shape[1]):
-                  solv_e_xyz_t[n,m,:] -= xyz_shift
-            for n in range(solv_p_xyz_t.shape[0]):
-               for m in range(solv_p_xyz_t.shape[1]):
-                  solv_p_xyz_t[n,m,:] -= xyz_shift
+         else:
+            sys.exit(" Cannot recognize this transformation operation {item}")
 
       # check the distance w.r.t ref atom before and after transformaton:
       #for n in range(solu_xyz.shape[0]):
-      #   print (" solute ",n,np.abs(distance(solu_xyz[atom_center,:],solu_xyz[n,:],box) - distance(solu_xyz_t[atom_center,:],solu_xyz_t[n,:],box)))
+      #   print (" solute ",n,np.linalg.norm(solu_xyz[atom_center,:]-solu_xyz[n,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solu_xyz_t[n,:]))
       #for n in range(solv_e_xyz.shape[0]):
       #   for m in range(solv_e_xyz.shape[1]):
-      #      print (" solvent ",n,m,np.abs(distance(solu_xyz[atom_center,:],solv_e_xyz[n,m,:],box) - distance(solu_xyz_t[atom_center,:],solv_e_xyz_t[n,m,:],box)))
+      #      print (" solvent ",n,m,np.linalg.norm(solu_xyz[atom_center,:]-solv_e_xyz[n,m,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solv_e_xyz_t[n,m,:]))
       #for n in range(solv_p_xyz.shape[0]):
       #   for m in range(solv_p_xyz.shape[1]):
       #      print (" solvent ",n,m,np.abs(distance(solu_xyz[atom_center,:],solv_p_xyz[n,m,:],box) - distance(solu_xyz_t[atom_center,:],solv_p_xyz_t[n,m,:],box)))
