@@ -198,7 +198,7 @@ class Mapbuilder:
             f.write(f"%nprocshared={self.ncores}\n")
             f.write("%chk=job.chk\n")
             f.write("%mem=20Gb\n")
-            f.write(f"#p Opt(MaxCycles={self.opt_cycles}) oniom({self.method}/{self.basis}:amber) NoSymm \n")
+            f.write(f"#p Opt(MaxCycles={self.opt_cycles},CalcFC) oniom({self.method}/{self.basis}:amber) NoSymm \n")
             f.write(" \n")
             f.write(f"{self.solute[0]} in solvent \n")
             f.write(" \n")
