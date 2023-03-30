@@ -28,12 +28,12 @@ class AmideI:
      self.atoms, self.molecules, self.atoms_in_mol, _, _ = s.read()
 
      # find indices of peptide groups in each molecule.
-     chrom_start_idx, amideI_list_idx, n_amideI_mol = chromList(self.isotope_labels, self.amideI_unit, self.atoms, self.atoms_in_mol)
-     if not chrom_start_idx:
+     chrom_idx, amideI_list_idx, n_amideI_mol = chromList(self.isotope_labels, self.amideI_unit, self.atoms, self.atoms_in_mol)
+     if not chrom_idx:
         print(f" Did not find any amide I groups like this: {self.amideI_unit}")
         sys.exit(" exiting...")
      else:
-        print(f"       Found {len(chrom_start_idx)} amide I chromophores: ")
+        print(f"       Found {len(chrom_idx)} amide I chromophores: ")
         [print (f"       {id} in {molid[0]} ") for (id,molid) in zip(n_amideI_mol,self.molecules) if id>0]
 
      # run loop over MD snapshots to get the Hamiltonian

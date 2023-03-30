@@ -40,7 +40,7 @@ def chromList(isotope_labels, search_unit, atoms, atoms_in_mol):
         aIind.append(amd2)
         nas.append(len(cout))
         if cout:
-           cind.append(cout2)
+           cind.append(cout2[0])
         ist+=numa
      return cind, aIind, nas
 
