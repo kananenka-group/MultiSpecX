@@ -32,5 +32,7 @@ class Ester:
         print(f"       Found {len(chrom_start_idx)} ester chromophores: ")
         [print (f"       {id} in {molid[0]} ") for (id,molid) in zip(n_ester_mol,self.molecules) if id>0]
 
-
+     # determine where charge group start
      cgS = chargeGroupSt(self.atoms)
+
+     print(chrom_start_idx)
