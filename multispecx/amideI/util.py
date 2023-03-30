@@ -32,12 +32,15 @@ def chromList(isotope_labels, search_unit, atoms, atoms_in_mol):
      cind=[]
      aIind=[]
      nas=[]
+  
      for numa in atoms_in_mol:
         cout, amd = getIndex(search_unit, isotope_labels, res_num[ist:ist+numa], res_nam[ist:ist+numa], atm_nam[ist:ist+numa])
-        aIind.append(amd)
+        cout2 = [ [ y+ist for y in x ] for x in cout]
+        amd2  = [ [ y+ist for y in x ] for x in amd]
+        aIind.append(amd2)
         nas.append(len(cout))
         if cout:
-           cind.append(cout)
+           cind.append(cout2)
         ist+=numa
      return cind, aIind, nas
 
@@ -54,12 +57,12 @@ def getIndex(a_unit, isotope_labels, res_num, res_nam, atm_nam):
    for n in range(natoms-nfind):
       if a_unit == atm_nam[n:n+nfind]:
          resid = res_nam[n]+res_num[n]
-         amideI_list.append(n)
+         amideI_list.append(list(range(n,n+nfind)))
          if not isotope_labels:
-            chrom_list.append(n)
+            chrom_list.append(list(range(n,n+nfind)))
          else:
             if resid in isotope_labels:
-                chrom_list.append(n)
+                chrom_list.append(list(range(n,n+nfind)))
              
    return chrom_list, amideI_list
        
