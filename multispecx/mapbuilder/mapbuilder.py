@@ -64,6 +64,8 @@ class Mapbuilder:
         # input file
         self.QC_input_file(solu_xyzT, solv_e_xyzT, solv_p_xyzT, frame)
 
+     print(f"      Average number of solvent molecules within {self.cut_off1} A cutoff is {ws_count/self.nframes}")
+
    def extract_solute_solvent(self):
      # create a system object
      s = System(self.itp,self.top,self.gro,self.xyz)
