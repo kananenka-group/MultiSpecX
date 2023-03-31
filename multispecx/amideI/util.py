@@ -1,5 +1,26 @@
 import numpy as np
 
+def inBox(v, box):
+   vo = np.copy(v)
+   for n in range(v.shape[0]):
+     if vo[n] < 0.0:
+       vo[n] += box[n]
+     elif vo[n] > box[n]:
+       vo[n] -= box[n]
+   return vo
+
+def centerBox(xyz, ref, box):
+   """
+      Center simulation box at a given loc.
+   """
+   xyzc = np.copy(xyz)
+
+   shift = np.subtract(ref,box/2)
+   for n in range(xyzc.shape[0]):
+      xyzc[n,:] = inBox(np.subtract(xyzc[n,:],shift),box)
+
+   return xyzc
+
 def getCOM(xyz, mass):
    """
       Calculate center of mass
