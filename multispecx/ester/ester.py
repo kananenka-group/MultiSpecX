@@ -50,18 +50,15 @@ class Ester:
      print(f" >>>>> Reading frames from {self.xtc} file") 
      print(f"       Total number of frames to read: {nframes}")
      for frame in range(nframes):
-        xyz = 10.0*t.xyz[frame,:,:]
-        box = 10.0*t.unitcell_lengths[frame,:]
+        xyz_raw = 10.0*t.xyz[frame,:,:]
+        box     = 10.0*t.unitcell_lengths[frame,:]
 
         # loop over all chromphores
         for chrom in chrom_idx:
 
            # re-center box at the COM of selected atoms
-           xyz_chrom = xyz[chrom,:]
-           print (xyz_chrom)
-           mas_chrom = masses[chrom]
-           com = getCOM(xyz_chrom, mas_chrom)
-           print (com)
-           ddd
+           xyz_chrom = xyz_raw[chrom,:]
+           com = getCOM(xyz_chrom, masses[chrom])
+           xyz = centerBox(xyz_raw, com, box)
 
-        # determine COM for all charge groups
+           # determine COM for all charge groups
