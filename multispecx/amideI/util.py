@@ -1,11 +1,15 @@
 import numpy as np
 
-def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS):
+def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS) -> list[int]:
 
+   atoms_include:list(int) = []
    for n in range(xyz.shape[0]):
       if np.linalg.norm(xyz[n,:]-xyz_ref) < cut:
-         atoms = np.arange(cgS[n],cgS[n+1],dtype=int)
-         ddd
+         atoms = list(range(cgS[n],cgS[n+1]))
+         atoms_include.extend(atoms)
+   [ atoms_include.remove(atr) for atr in atoms_exclude ]
+   
+   return np.asarray(atoms_include,dtype=int)
 
 def getCOMChg(xyz, cgS, masses):
    """
