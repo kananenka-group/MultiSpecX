@@ -16,11 +16,12 @@ class Ester:
    isotope_labels: list = field(default_factory=lambda: [])
    transform: list = field(default_factory=lambda: [])
    start: int = 1
-   elFmap: str  = "BaizXXX"
+   elFmap: str  = "Baiz2016"
+   
    freq_shift: float = 0.0
 
    def generateHamiltonian(self): 
-     emap_cut = 12.0
+     emap_cut = 20.0
 
      # create a system object
      s = System(self.itp,self.top,self.gro)
@@ -42,6 +43,9 @@ class Ester:
      # build coordiate transformation here
      self.transform_internal = getInternalTransformXYZ(self.transform, self.ester_unit, chrom_idx)
 
+     # figure out how to use map:
+     #self.getMap()
+
      # prepare some variables for fast processing
      charges = np.asarray([ x[6] for x in self.atoms ],dtype=np.float32)
      masses  = np.asarray([ x[7] for x in self.atoms ],dtype=np.float32)
@@ -52,6 +56,7 @@ class Ester:
 
      print(f" >>>>> Reading frames from {self.xtc} file") 
      print(f"       Total number of frames to read: {nframes}")
+     avg_w = 0.0
      for frame in range(nframes):
         xyz_raw = 10.0*t.xyz[frame,:,:]
         box     = 10.0*t.unitcell_lengths[frame,:]
@@ -76,5 +81,13 @@ class Ester:
            ester_t, envr_t = transformXYZ(self.transform_internal[chind], xyz_chrom, xyz[atoms_include,:])
 
            # calculate electric field components at selected atoms
-           print (ester_t)
-           ddd 
+           ef_atoms_num = [0, 1, 2] 
+           efc, efp = calcEf(ef_atoms_num, envr_t, ester_t, charges[atoms_include])
+           
+           # map goes here
+           w0 = 1745.0
+           w = w0 + 1967.6*efc[0,0] - 640.4*efc[0,1] - 835.4*efc[0,2] + 1154.6*efc[1,0] - 1964.2*efc[1,1] -2776.0*efc[2,1]
+          
+           avg_w += w
+     
+        print (f" Average frequency {avg_w/(len(chrom_idx)*(frame+1))}") 
