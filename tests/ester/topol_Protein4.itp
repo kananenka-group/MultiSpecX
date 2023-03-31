@@ -2,7 +2,7 @@
 ;	File 'topol_Protein4.itp' was generated
 ;	By user: unknown (24088)
 ;	On host: hpclogin3.chtc.wisc.edu
-;	At date: Fri Mar 10 12:01:35 2023
+;	At date: Mon Mar 13 12:49:01 2023
 ;
 ;	This is a include topology file
 ;
@@ -11,9 +11,9 @@
 ;	
 ;	Executable:   /home/goonetilleke/gromacs-2022.5/installed/bin/gmx_mpi
 ;	Data prefix:  /home/goonetilleke/gromacs-2022.5/installed
-;	Working dir:  /mnt/cephfs/scratch/goonetilleke/kwkk
+;	Working dir:  /mnt/cephfs/scratch/goonetilleke/kvkk
 ;	Command line:
-;	  gmx_mpi pdb2gmx -f kwkk.pdb -glu -ignh
+;	  gmx_mpi pdb2gmx -f kvkk.pdb -glu -ignh
 ;	Force field was read from current directory or a relative path - path added.
 ;
 
@@ -14941,6 +14941,6 @@ Protein4            3
 
 ; Include Position restraint file
 #ifdef POSRES_PROTEIN
-#include "posre_Proteincalphanofilter4.itp"
+#include "posre_Proteinfilter4.itp"
 #endif
 

@@ -2,7 +2,7 @@
 ;	File 'topol.top' was generated
 ;	By user: unknown (24088)
 ;	On host: hpclogin3.chtc.wisc.edu
-;	At date: Fri Mar 10 12:01:35 2023
+;	At date: Mon Mar 13 12:49:01 2023
 ;
 ;	This is a standalone topology file
 ;
@@ -11,9 +11,9 @@
 ;	
 ;	Executable:   /home/goonetilleke/gromacs-2022.5/installed/bin/gmx_mpi
 ;	Data prefix:  /home/goonetilleke/gromacs-2022.5/installed
-;	Working dir:  /mnt/cephfs/scratch/goonetilleke/kwkk
+;	Working dir:  /mnt/cephfs/scratch/goonetilleke/kvkk
 ;	Command line:
-;	  gmx_mpi pdb2gmx -f kwkk.pdb -glu -ignh
+;	  gmx_mpi pdb2gmx -f kvkk.pdb -glu -ignh
 ;	Force field was read from current directory or a relative path - path added.
 ;
 
@@ -30,7 +30,7 @@
 #include "topol_Other7.itp"
 
 ; Include water topology
-#include "./charmm36-jul2021.ff/tip3p.itp"
+#include "./charmm36-jul2021.ff/spc.itp"
 
 #ifdef POSRES_WATER
 ; Position restraint for each water oxygen
@@ -55,4 +55,4 @@ Protein4            1
 Other5              1
 Other6              1
 Other7              1
-SOL             12860
+SOL             12859
