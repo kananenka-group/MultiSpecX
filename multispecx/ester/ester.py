@@ -39,6 +39,10 @@ class Ester:
      # build coordiate transformation here
      self.transform_internal = getInternalTransformXYZ(self.transform, self.ester_unit, chrom_idx)
 
+     # prepare some variables for fast processing
+     charges = np.asarray([ x[6] for x in self.atoms ],dtype=np.float32)
+     masses  = np.asarray([ x[7] for x in self.atoms ],dtype=np.float32)
+
      # loop over all frames
      t = md.load(self.xtc, top=self.gro)
      nframes = t.xyz.shape[0]
@@ -49,7 +53,15 @@ class Ester:
         xyz = 10.0*t.xyz[frame,:,:]
         box = 10.0*t.unitcell_lengths[frame,:]
 
-        # re-center box at the COM of selected atoms
+        # loop over all chromphores
+        for chrom in chrom_idx:
 
+           # re-center box at the COM of selected atoms
+           xyz_chrom = xyz[chrom,:]
+           print (xyz_chrom)
+           mas_chrom = masses[chrom]
+           com = getCOM(xyz_chrom, mas_chrom)
+           print (com)
+           ddd
 
         # determine COM for all charge groups
