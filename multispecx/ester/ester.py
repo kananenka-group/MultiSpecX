@@ -33,12 +33,11 @@ class Ester:
         print(f"       Found {len(chrom_idx)} ester chromophores: ")
         [print (f"       {id} in {molid[0]} ") for (id,molid) in zip(n_ester_mol,self.molecules) if id>0]
 
-     # determine where charge group start
+     # determine where charge groups start
      cgS = chargeGroupSt(self.atoms)
 
      # build coordiate transformation here
      self.transform_internal = getInternalTransformXYZ(self.transform, self.ester_unit, chrom_idx)
-
 
      # loop over all frames
      t = md.load(self.xtc, top=self.gro)
@@ -46,6 +45,6 @@ class Ester:
 
      print(f" >>>>> Reading frames from {self.xtc} file") 
      print(f"       Total number of frames to read: {nframes}")
-     #for frame in range(nframes):
-     #   xyz = 10.0*t.xyz[frame,:,:]
-     #   box = 10.0*t.unitcell_lengths[frame,:]
+     for frame in range(nframes):
+        xyz = 10.0*t.xyz[frame,:,:]
+        box = 10.0*t.unitcell_lengths[frame,:]
