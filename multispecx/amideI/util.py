@@ -1,5 +1,97 @@
 import numpy as np
 
+def transformXYZ(transform, solu_xyz, solv_xyz):
+   """
+      Here input coordinates for the solute and solvent will be
+      transformed
+   """
+   thresh=1.0e-4
+   solu_xyz_t = np.copy(solu_xyz)
+   solv_xyz_t = np.copy(solv_xyz)
+
+   for item in transform:
+      # center frame on a given atom
+      if item[0].lower() == "center":
+         atom_center=item[1]-1
+         xyz_shift = np.copy(solu_xyz_t[atom_center,:])
+         if np.linalg.norm(xyz_shift) > 1.0e-4:
+            solu_xyz_t[:,:]   = np.subtract(solu_xyz_t[:,:],xyz_shift)
+            solv_xyz_t[:,:,:] = np.subtract(solv_xyz_t[:,:,:],xyz_shift)
+      # align w.r.t particular axis
+      elif item[0].lower() == "rotate":
+         atomn = item[1]-1
+         atomp = item[2]-1
+         va = np.subtract(solu_xyz_t[atomp,:],solu_xyz_t[atomn,:])
+         if item[3].lower() == "z":
+            vb = np.array([0.0,0.0,1.0])
+         elif item[3].lower() == "y":
+            vb = np.array([0.0,1.0,0.0])
+         elif item[3].lower() == "x":
+            vb = np.array([1.0,0.0,0.0])
+         else:
+            sys.exit(f" Cannot recognize the rotation axis {item[3]} can only be 'x', 'y', or 'z'") 
+         Rot = rotation_matrix(va,vb) 
+
+         # rotate all atoms here ...
+         if np.linalg.norm(Rot-np.eye(3)) > 1.0e-4:
+            for n in range(solu_xyz_t.shape[0]):
+               solu_xyz_t[n,:] = Rot.dot(solu_xyz_t[n,:])
+            for n in range(solv_e_xyz_t.shape[0]):
+               for m in range(solv_xyz_t.shape[1]):
+                     solv_xyz_t[n,m,:] = Rot.dot(solv_xyz_t[n,m,:])
+      else:
+         sys.exit(" Cannot recognize this transformation operation {item}")
+
+   # check the distance w.r.t ref atom before and after transformaton:
+   su_er = np.linalg.norm(solu_xyz[atom_center,:]-solu_xyz[:,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solu_xyz_t[:,:])
+   if np.max(np.abs(su_er)) > thresh:
+      sys.exit(f" Error with solvent coordinate transformation {su_er}")
+
+   sv_er1 = np.linalg.norm(solu_xyz[atom_center,:]-solv_xyz[:,:,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solv_xyz_t[:,:,:])
+   if np.max(np.abs(sv_er1)) > thresh:
+      sys.exit(f" Error with solvent coordinate transformation {sv_er1}")
+
+   return solu_xyz_t, solv_xyz_t
+
+   def print_transform_info(self):
+      """
+         Just print transformation operations to be applied
+      """ 
+      if self.transform:
+         print(f">>>>> Coordinate transformation:")
+
+      for item in self.transform:
+         if item[0].lower() == "center":
+            print(f"      The frames will be translated to put atom {self.solute[3][item[1]-1]}({item[1]}) at the center of the box.")
+         if item[0].lower() == "rotate":
+            print(f"      The frames will be rotated such that vector {self.solute[3][item[1]-1]}({item[1]}) -> {self.solute[3][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
+
+ 
+   def SplitSolvent(self, solu_xyz, solv_xyz, box):
+      """
+         Split solvent molecules into 2 groups:
+         - explicit solvent 
+         - solvent to be used as point charges
+      """
+      # find reference atoms
+      sura = self.solute[1].index(self.solu_ref_atom)
+      svra = self.solvent[1].index(self.solv_ref_atom)
+      n_solv_atoms = len(self.solvent[1])
+      n_solv_mols  = solv_xyz.shape[0] // n_solv_atoms
+
+      sv_qm = []  
+      sv_pc = []
+      for n in range(n_solv_mols):
+         vnr = solv_xyz[n_solv_atoms*n+svra] - solu_xyz[sura,:]
+         vnn = minImage(vnr,box)      
+         dnn = np.sqrt(vnn.dot(vnn))
+         if dnn < self.cut_off2:
+            if dnn < self.cut_off1:
+               sv_qm.append(solv_xyz[n_solv_atoms*n:n_solv_atoms*n+n_solv_atoms,:])
+            else:
+               sv_pc.append(solv_xyz[n_solv_atoms*n:n_solv_atoms*n+n_solv_atoms,:])
+
+
 def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS) -> list[int]:
 
    atoms_include:list(int) = []
@@ -62,18 +154,18 @@ def getInternalTransformXYZ(transform_in, atom_names, chrom_idx):
             tloc = []
             tloc.append('center')
             loc = atom_names.index(item[1])
-            tloc.append(chrom_idx_in[loc])
+            tloc.append(loc) #chrom_idx_in[loc])
          elif item[0] == 'rotate':
             tloc = []
             tloc.append('rotate')
             loc1 = atom_names.index(item[1])
             loc2 = atom_names.index(item[2])
-            tloc.append(chrom_idx_in[loc1])
-            tloc.append(chrom_idx_in[loc2]) 
+            tloc.append(loc1) #chrom_idx_in[loc1])
+            tloc.append(loc2) #chrom_idx_in[loc2]) 
             tloc.append(item[3])
          this_chrom.append(tloc)
       transform_out.append(this_chrom)
-   
+
     return transform_out 
 
 def chargeGroupSt(atoms):
