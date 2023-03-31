@@ -57,8 +57,12 @@ class Ester:
         for chrom in chrom_idx:
 
            # re-center box at the COM of selected atoms
-           xyz_chrom = xyz_raw[chrom,:]
-           com = getCOM(xyz_chrom, masses[chrom])
+           xyz_chrom_raw = xyz_raw[chrom,:]
+           com = getCOM(xyz_chrom_raw, masses[chrom])
            xyz = centerBox(xyz_raw, com, box)
+           xyz_chrom = xyz[chrom,:]
+
+           print (xyz_chrom)
+           dddd
 
            # determine COM for all charge groups
