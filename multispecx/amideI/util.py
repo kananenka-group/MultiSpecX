@@ -1,13 +1,7 @@
 import numpy as np
 
 def inBox(v, box):
-   vo = np.copy(v)
-   for n in range(v.shape[0]):
-     if vo[n] < 0.0:
-       vo[n] += box[n]
-     elif vo[n] > box[n]:
-       vo[n] -= box[n]
-   return vo
+   return v - np.multiply(box,np.floor(np.divide(v,box)))
 
 def centerBox(xyz, ref, box):
    """
