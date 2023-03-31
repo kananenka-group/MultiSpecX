@@ -48,3 +48,8 @@ class Ester:
      for frame in range(nframes):
         xyz = 10.0*t.xyz[frame,:,:]
         box = 10.0*t.unitcell_lengths[frame,:]
+
+        # re-center box at the COM of selected atoms
+
+
+        # determine COM for all charge groups
