@@ -1,5 +1,15 @@
 import numpy as np
 
+def getCOM(xyz, mass):
+   """
+      Calculate center of mass
+   """
+   com = np.zeros((3))
+   tmas = np.sum(mass)
+   for n in range(3):
+      com[n] = np.sum(np.multiply(xyz[:,n],mass))/tmas
+   return com
+
 def getInternalTransformXYZ(transform_in, atom_names, chrom_idx):
     print(f" >>>>> Building coordinate transformation matrix.")
     transform_out = []
