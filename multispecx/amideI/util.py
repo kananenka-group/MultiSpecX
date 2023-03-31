@@ -1,5 +1,29 @@
 import numpy as np
 
+def getInternalTransformXYZ(transform_in, atom_names, chrom_idx):
+    print(f" >>>>> Building coordinate transformation matrix.")
+    transform_out = []
+    for chrom_idx_in in chrom_idx:
+      this_chrom=[]
+      for item in transform_in:
+         if item[0] == 'center': 
+            tloc = []
+            tloc.append('center')
+            loc = atom_names.index(item[1])
+            tloc.append(chrom_idx_in[loc])
+         elif item[0] == 'rotate':
+            tloc = []
+            tloc.append('rotate')
+            loc1 = atom_names.index(item[1])
+            loc2 = atom_names.index(item[2])
+            tloc.append(chrom_idx_in[loc1])
+            tloc.append(chrom_idx_in[loc2]) 
+            tloc.append(item[3])
+         this_chrom.append(tloc)
+      transform_out.append(this_chrom)
+   
+    return transform_out 
+
 def chargeGroupSt(atoms):
    """
       This function determines were each charge group starts.
