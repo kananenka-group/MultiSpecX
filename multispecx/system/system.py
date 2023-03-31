@@ -68,8 +68,8 @@ class System:
           4. atom name
           5. charge group
           6. atomic charge
-          7. molecule name
-          8. id of a molecule this atom belongs to (w.r.t. molecules defined in the top file)
+          7. mass
+          8. molecule name
           9. id of a molecule this atoms belongs to (w.r.t the total number of molecules)
 
       """
