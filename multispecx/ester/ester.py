@@ -34,7 +34,8 @@ class Ester:
         [print (f"       {id} in {molid[0]} ") for (id,molid) in zip(n_ester_mol,self.molecules) if id>0]
 
      # determine where charge groups start
-     cgS = chargeGroupSt(self.atoms)
+     cgO = chargeGroupSt(self.atoms)
+     cgS = np.append(cgO,[len(self.atoms)])
 
      # build coordiate transformation here
      self.transform_internal = getInternalTransformXYZ(self.transform, self.ester_unit, chrom_idx)
@@ -58,11 +59,12 @@ class Ester:
 
            # re-center box at the COM of selected atoms
            xyz_chrom_raw = xyz_raw[chrom,:]
-           com = getCOM(xyz_chrom_raw, masses[chrom])
-           xyz = centerBox(xyz_raw, com, box)
+           com_raw = getCOM(xyz_chrom_raw, masses[chrom])
+           xyz = centerBox(xyz_raw, com_raw, box)
            xyz_chrom = xyz[chrom,:]
-
-           print (xyz_chrom)
-           dddd
+           com = getCOM(xyz_chrom, masses[chrom])
 
            # determine COM for all charge groups
+           comCg = getCOMChg(xyz, cgS, masses)
+           print (comCg)
+           ddd
