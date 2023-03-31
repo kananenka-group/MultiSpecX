@@ -70,4 +70,6 @@ class Ester:
            comCg = getCOMChg(xyz, cgS, masses)
 
            # save atoms that contribute to efield of this chromophore 
-           AinF(comCg, chrom, com, emap_cut, cgS)
+           atoms_include = AinF(comCg, chrom, com, emap_cut, cgS)
+           
+           # coordinate transformation for all included_atoms and ester unit
