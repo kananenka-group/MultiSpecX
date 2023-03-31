@@ -1,5 +1,23 @@
 import numpy as np
 
+def calcEf(atoms, xyz, xyz_ref, charges):
+   """
+      Caclulate electric fields on atoms
+   """
+   assert xyz.shape[0] == len(charges), f" something is wrong in calcEf {xyz_ref.shape[0]} vs {len(charges)}"
+
+   eF = np.zeros((len(atoms),3))
+   for atom in atoms:
+      eFa = np.zeros((3))
+      for ai in range(xyz.shape[0]):
+         vij = xyz[ai,:] - xyz_ref[atom,:]
+         vij *= 1.88973
+         dij = np.linalg.norm(vij)
+         dij3 = dij**3
+         eFa += vij*charges[ai]/dij3
+      eF[atom,:] = np.copy(eFa) 
+   return eF, eF
+
 def rotation_matrix(va, vb):
    """
       Generate rotation matrix:
