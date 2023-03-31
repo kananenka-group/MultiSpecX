@@ -20,6 +20,8 @@ class Ester:
    freq_shift: float = 0.0
 
    def generateHamiltonian(self): 
+     emap_cut = 12.0
+
      # create a system object
      s = System(self.itp,self.top,self.gro)
      self.atoms, self.molecules, self.atoms_in_mol, _, _ = s.read()
@@ -66,5 +68,6 @@ class Ester:
 
            # determine COM for all charge groups
            comCg = getCOMChg(xyz, cgS, masses)
-           print (comCg)
-           ddd
+
+           # save atoms that contribute to efield of this chromophore 
+           AinF(comCg, chrom, com, emap_cut, cgS)
