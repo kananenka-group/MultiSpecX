@@ -1,5 +1,21 @@
 import numpy as np
 
+def getCOMChg(xyz, cgS, masses):
+   """
+      Returns center of masses of all charge groups
+   """
+   nchg = len(cgS)-1
+   natoms = len(masses)
+
+   com = np.zeros((nchg,3))
+   for n in range(nchg):
+     gs = cgS[n]
+     ge = cgS[n+1]
+     mg = masses[gs:ge]
+     cg = xyz[gs:ge,:]
+     com[n,:] = getCOM(cg, mg)
+   return com
+
 def inBox(v, box):
    return v - np.multiply(box,np.floor(np.divide(v,box)))
 
