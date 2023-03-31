@@ -3,11 +3,12 @@ import os
 from pathlib import Path
 from dataclasses import dataclass, field
 
-from .util import check_order, check_4site_water, rotation_matrix, minImage, PBC, distance, inBox
+from .util import check_order, check_4site_water, minImage, PBC, distance, inBox
 
 import mdtraj as md
 
 from ..system import *
+from ..amideI import *
 
 @dataclass
 class Mapbuilder:
