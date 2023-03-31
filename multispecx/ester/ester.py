@@ -14,6 +14,7 @@ class Ester:
    top:  str = "topology.top"
    nframes: int = 1
    isotope_labels: list = field(default_factory=lambda: [])
+   transform: list = field(default_factory=lambda: [])
    start: int = 1
    elFmap: str  = "BaizXXX"
    freq_shift: float = 0.0
@@ -24,24 +25,27 @@ class Ester:
      self.atoms, self.molecules, self.atoms_in_mol, _, _ = s.read()
 
      # find indices of ester groups in each molecule
-     chrom_start_idx, ester_list_idx, n_ester_mol = chromList(self.isotope_labels, self.ester_unit, self.atoms, self.atoms_in_mol)
-     if not chrom_start_idx:
+     chrom_idx, ester_list_idx, n_ester_mol = chromList(self.isotope_labels, self.ester_unit, self.atoms, self.atoms_in_mol)
+     if not chrom_idx:
         print(f" Did not find any ester groups like this: {self.ester_unit}")
         sys.exit(" exiting...")
      else:
-        print(f"       Found {len(chrom_start_idx)} ester chromophores: ")
+        print(f"       Found {len(chrom_idx)} ester chromophores: ")
         [print (f"       {id} in {molid[0]} ") for (id,molid) in zip(n_ester_mol,self.molecules) if id>0]
 
      # determine where charge group start
      cgS = chargeGroupSt(self.atoms)
 
-     print(chrom_start_idx)
+     # build coordiate transformation here
+     self.transform_internal = getInternalTransformXYZ(self.transform, self.ester_unit, chrom_idx)
+
 
      # loop over all frames
-     #t = md.load(self.xtc, top=self.gro)
-     #nframes = t.xyz.shape[0]
+     t = md.load(self.xtc, top=self.gro)
+     nframes = t.xyz.shape[0]
 
-     #printf(f">>>>>>> Reading frames from {self.xtc}, total number of frames = {nframes}")
+     print(f" >>>>> Reading frames from {self.xtc} file") 
+     print(f"       Total number of frames to read: {nframes}")
      #for frame in range(nframes):
      #   xyz = 10.0*t.xyz[frame,:,:]
      #   box = 10.0*t.unitcell_lengths[frame,:]
