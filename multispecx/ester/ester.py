@@ -57,7 +57,7 @@ class Ester:
         box     = 10.0*t.unitcell_lengths[frame,:]
 
         # loop over all chromphores
-        for chrom in chrom_idx:
+        for chind, chrom in enumerate(chrom_idx):
 
            # re-center box at the COM of selected atoms
            xyz_chrom_raw = xyz_raw[chrom,:]
@@ -73,3 +73,8 @@ class Ester:
            atoms_include = AinF(comCg, chrom, com, emap_cut, cgS)
            
            # coordinate transformation for all included_atoms and ester unit
+           ester_t, envr_t = transformXYZ(self.transform_internal[chind], xyz_chrom, xyz[atoms_include,:])
+
+           # calculate electric field components at selected atoms
+           print (ester_t)
+           ddd 
