@@ -1,5 +1,47 @@
 import numpy as np
 
+def rotation_matrix(va, vb):
+   """
+      Generate rotation matrix:
+      find a rotation matrix R that rotates vector va onto vector vb
+      
+      The rotation matrix is given by:
+      R = I + [v]x + [v]x^2*(1-c)/s^2
+
+      where:
+      ------
+      I       -  3x3 identity matrix
+      [v]x    - the skew-symmetric cross-product matrix of v which is a cross product of va and vb
+      c       - a dot product of a and b (cosine of angle)
+      s       -  the magnitude of a cross product between a and b
+
+      [v]x    is (Vx) variable below
+      1-c/s^2 can also be written as 1-c/s^2 = 1-c/(1-c^2) = 1/(1+c)
+
+      This approach works unless c=-1 which corresponds to
+      uva and uvb pointing in exactly opposite direction. This special
+      case is addressed below too
+   """
+   uva = va/np.linalg.norm(va)
+   uvb = vb/np.linalg.norm(vb)
+
+   v = np.cross(uva, uvb)
+   s = v/np.linalg.norm(v)
+   c = np.dot(uva,uvb)
+
+   if c > -1.0:
+      Vx = np.array([[    0, -v[2],   v[1]],
+                     [ v[2],     0,  -v[0]],
+                     [-v[1],  v[0],      0]])
+      Vx2 = Vx @ Vx
+      fc = 1.0/(1.0 + c)
+      Rot = np.eye(3) + Vx + fc*Vx2
+   else:
+      indl = np.where(uvb == 1.0)[0]
+      Rot = np.eye(3)
+      Rot[:,indl] *=-1
+   return Rot
+ 
 def transformXYZ(transform, solu_xyz, solv_xyz):
    """
       Here input coordinates for the solute and solvent will be
@@ -15,8 +57,8 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          atom_center=item[1]-1
          xyz_shift = np.copy(solu_xyz_t[atom_center,:])
          if np.linalg.norm(xyz_shift) > 1.0e-4:
-            solu_xyz_t[:,:]   = np.subtract(solu_xyz_t[:,:],xyz_shift)
-            solv_xyz_t[:,:,:] = np.subtract(solv_xyz_t[:,:,:],xyz_shift)
+            solu_xyz_t[:,:] = np.subtract(solu_xyz_t[:,:],xyz_shift)
+            solv_xyz_t[:,:] = np.subtract(solv_xyz_t[:,:],xyz_shift)
       # align w.r.t particular axis
       elif item[0].lower() == "rotate":
          atomn = item[1]-1
@@ -36,9 +78,8 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          if np.linalg.norm(Rot-np.eye(3)) > 1.0e-4:
             for n in range(solu_xyz_t.shape[0]):
                solu_xyz_t[n,:] = Rot.dot(solu_xyz_t[n,:])
-            for n in range(solv_e_xyz_t.shape[0]):
-               for m in range(solv_xyz_t.shape[1]):
-                     solv_xyz_t[n,m,:] = Rot.dot(solv_xyz_t[n,m,:])
+            for n in range(solv_xyz_t.shape[0]):
+               solv_xyz_t[n,:] = Rot.dot(solv_xyz_t[n,:])
       else:
          sys.exit(" Cannot recognize this transformation operation {item}")
 
@@ -47,7 +88,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
    if np.max(np.abs(su_er)) > thresh:
       sys.exit(f" Error with solvent coordinate transformation {su_er}")
 
-   sv_er1 = np.linalg.norm(solu_xyz[atom_center,:]-solv_xyz[:,:,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solv_xyz_t[:,:,:])
+   sv_er1 = np.linalg.norm(solu_xyz[atom_center,:]-solv_xyz[:,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solv_xyz_t[:,:])
    if np.max(np.abs(sv_er1)) > thresh:
       sys.exit(f" Error with solvent coordinate transformation {sv_er1}")
 
@@ -154,14 +195,14 @@ def getInternalTransformXYZ(transform_in, atom_names, chrom_idx):
             tloc = []
             tloc.append('center')
             loc = atom_names.index(item[1])
-            tloc.append(loc) #chrom_idx_in[loc])
+            tloc.append(loc+1) #chrom_idx_in[loc])
          elif item[0] == 'rotate':
             tloc = []
             tloc.append('rotate')
             loc1 = atom_names.index(item[1])
             loc2 = atom_names.index(item[2])
-            tloc.append(loc1) #chrom_idx_in[loc1])
-            tloc.append(loc2) #chrom_idx_in[loc2]) 
+            tloc.append(loc1+1) #chrom_idx_in[loc1])
+            tloc.append(loc2+1) #chrom_idx_in[loc2]) 
             tloc.append(item[3])
          this_chrom.append(tloc)
       transform_out.append(this_chrom)
