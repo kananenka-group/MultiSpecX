@@ -1,5 +1,12 @@
 import numpy as np
 
+def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS):
+
+   for n in range(xyz.shape[0]):
+      if np.linalg.norm(xyz[n,:]-xyz_ref) < cut:
+         atoms = np.arange(cgS[n],cgS[n+1],dtype=int)
+         ddd
+
 def getCOMChg(xyz, cgS, masses):
    """
       Returns center of masses of all charge groups
