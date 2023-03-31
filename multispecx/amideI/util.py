@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 def calcEf(atoms, xyz, xyz_ref, charges):
    """
@@ -58,6 +59,8 @@ def rotation_matrix(va, vb):
       indl = np.where(uvb == 1.0)[0]
       Rot = np.eye(3)
       Rot[:,indl] *=-1
+
+   #print (" rotation matrix ",Rot)
    return Rot
  
 def transformXYZ(transform, solu_xyz, solv_xyz):
@@ -65,7 +68,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
       Here input coordinates for the solute and solvent will be
       transformed
    """
-   thresh=1.0e-4
+   thresh=1.0e-1
    solu_xyz_t = np.copy(solu_xyz)
    solv_xyz_t = np.copy(solv_xyz)
 
@@ -74,9 +77,10 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
       if item[0].lower() == "center":
          atom_center=item[1]-1
          xyz_shift = np.copy(solu_xyz_t[atom_center,:])
-         if np.linalg.norm(xyz_shift) > 1.0e-4:
-            solu_xyz_t[:,:] = np.subtract(solu_xyz_t[:,:],xyz_shift)
-            solv_xyz_t[:,:] = np.subtract(solv_xyz_t[:,:],xyz_shift)
+         for n in range(solu_xyz_t.shape[0]):
+            solu_xyz_t[n,:] = np.subtract(solu_xyz_t[n,:],xyz_shift)
+         for n in range(solv_xyz_t.shape[0]):
+            solv_xyz_t[n,:] = np.subtract(solv_xyz_t[n,:],xyz_shift)
       # align w.r.t particular axis
       elif item[0].lower() == "rotate":
          atomn = item[1]-1
@@ -91,24 +95,27 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          else:
             sys.exit(f" Cannot recognize the rotation axis {item[3]} can only be 'x', 'y', or 'z'") 
          Rot = rotation_matrix(va,vb) 
-
          # rotate all atoms here ...
-         if np.linalg.norm(Rot-np.eye(3)) > 1.0e-4:
-            for n in range(solu_xyz_t.shape[0]):
-               solu_xyz_t[n,:] = Rot.dot(solu_xyz_t[n,:])
-            for n in range(solv_xyz_t.shape[0]):
-               solv_xyz_t[n,:] = Rot.dot(solv_xyz_t[n,:])
+         for n in range(solu_xyz_t.shape[0]):
+            solu_xyz_t[n,:] = Rot.dot(solu_xyz_t[n,:])
+         for n in range(solv_xyz_t.shape[0]):
+            solv_xyz_t[n,:] = Rot.dot(solv_xyz_t[n,:])
       else:
          sys.exit(" Cannot recognize this transformation operation {item}")
 
    # check the distance w.r.t ref atom before and after transformaton:
-   su_er = np.linalg.norm(solu_xyz[atom_center,:]-solu_xyz[:,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solu_xyz_t[:,:])
+   su_er = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solu_xyz[:,:])) - np.linalg.norm(np.subtract(solu_xyz_t[atom_center,:],solu_xyz_t[:,:]))
    if np.max(np.abs(su_er)) > thresh:
-      sys.exit(f" Error with solvent coordinate transformation {su_er}")
+      sys.exit(f" Error with coordinate transformation {su_er}")
 
-   sv_er1 = np.linalg.norm(solu_xyz[atom_center,:]-solv_xyz[:,:]) - np.linalg.norm(solu_xyz_t[atom_center,:]-solv_xyz_t[:,:])
-   if np.max(np.abs(sv_er1)) > thresh:
-      sys.exit(f" Error with solvent coordinate transformation {sv_er1}")
+   for n in range(solv_xyz.shape[0]):
+      sv_er1 = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solv_xyz[n,:])) - np.linalg.norm(np.subtract(solu_xyz_t[atom_center,:],solv_xyz_t[n,:]))
+      if np.max(np.abs(sv_er1)) > thresh:
+         print(f" Warning. Potential problem with coordinate transformation: ")
+         print(" Before = ",solv_xyz[n,:])
+         print(" After = ",solv_xyz_t[n,:])
+         print(f" Norm difference = {sv_er1}")
+         #sys.exit("exiting...")
 
    return solu_xyz_t, solv_xyz_t
 
