@@ -3,7 +3,8 @@ import sys
 
 def calcEf(atoms, xyz, xyz_ref, charges):
    """
-      Caclulate electric fields on atoms
+      Caclulate electric fields on atoms and 
+      optionally projections on selected vectors
    """
    assert xyz.shape[0] == len(charges), f" something is wrong in calcEf {xyz_ref.shape[0]} vs {len(charges)}"
 
@@ -60,7 +61,6 @@ def rotation_matrix(va, vb):
       Rot = np.eye(3)
       Rot[:,indl] *=-1
 
-   #print (" rotation matrix ",Rot)
    return Rot
  
 def transformXYZ(transform, solu_xyz, solv_xyz):
@@ -68,7 +68,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
       Here input coordinates for the solute and solvent will be
       transformed
    """
-   thresh=1.0e-1
+   thresh=0.01
    solu_xyz_t = np.copy(solu_xyz)
    solv_xyz_t = np.copy(solv_xyz)
 
@@ -104,18 +104,25 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          sys.exit(" Cannot recognize this transformation operation {item}")
 
    # check the distance w.r.t ref atom before and after transformaton:
-   su_er = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solu_xyz[:,:])) - np.linalg.norm(np.subtract(solu_xyz_t[atom_center,:],solu_xyz_t[:,:]))
-   if np.max(np.abs(su_er)) > thresh:
-      sys.exit(f" Error with coordinate transformation {su_er}")
+   for n in range(solu_xyz.shape[0]):
+      bf = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solu_xyz[n,:]))
+      af = np.linalg.norm(np.subtract(solu_xyz_t[atom_center,:],solu_xyz_t[n,:]))
+      su_er = (bf-af)/bf
+      if np.max(np.abs(su_er)) > thresh:
+         print(f" Warning. Potential problem with coordinate transformation: ")
+         print(" Before = ",solu_xyz[n,:])
+         print(" After = ",solu_xyz_t[n,:])
+         print(f" Error (w.r.t. solute reference atom {atom_center}) = {100*sv_er} %")
 
    for n in range(solv_xyz.shape[0]):
-      sv_er1 = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solv_xyz[n,:])) - np.linalg.norm(np.subtract(solu_xyz_t[atom_center,:],solv_xyz_t[n,:]))
-      if np.max(np.abs(sv_er1)) > thresh:
+      bf = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solv_xyz[n,:]))
+      af = np.linalg.norm(np.subtract(solu_xyz_t[atom_center,:],solv_xyz_t[n,:]))
+      sv_er = (bf-af)/bf
+      if np.max(np.abs(sv_er)) > thresh:
          print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solv_xyz[n,:])
          print(" After = ",solv_xyz_t[n,:])
-         print(f" Norm difference = {sv_er1}")
-         #sys.exit("exiting...")
+         print(f" Error (w.r.t. solute reference atom {atom_center})= {100*sv_er} %")
 
    return solu_xyz_t, solv_xyz_t
 
