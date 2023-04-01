@@ -54,9 +54,13 @@ class Ester:
      t = md.load(self.xtc, top=self.gro)
      nframes = t.xyz.shape[0]
 
+     # 
+     Energy = np.zeros((nframes,len(chrom_idx),len(chrom_idx)),dtype=np.float32)  
+
      print(f" >>>>> Reading frames from {self.xtc} file") 
      print(f"       Total number of frames to read: {nframes}")
-     avg_w = 0.0
+
+     w_avg=0.0
      for frame in range(nframes):
         xyz_raw = 10.0*t.xyz[frame,:,:]
         box     = 10.0*t.unitcell_lengths[frame,:]
@@ -87,7 +91,8 @@ class Ester:
            # map goes here
            w0 = 1745.0
            w = w0 + 1967.6*efc[0,0] - 640.4*efc[0,1] - 835.4*efc[0,2] + 1154.6*efc[1,0] - 1964.2*efc[1,1] -2776.0*efc[2,1]
+           w_avg += w
           
-           avg_w += w
+           Energy[frame,chind,chind] = w
      
-        print (f" Average frequency {avg_w/(len(chrom_idx)*(frame+1))}") 
+     print (f" Average frequency {w_avg/(len(chrom_idx)*(frame+1))}")
