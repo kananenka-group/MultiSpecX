@@ -107,7 +107,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
    for n in range(solu_xyz.shape[0]):
       bf = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solu_xyz[n,:]))
       af = np.linalg.norm(np.subtract(solu_xyz_t[atom_center,:],solu_xyz_t[n,:]))
-      su_er = (bf-af)/bf
+      su_er = (bf-af)/bf if bf > 0.0 else 0.0
       if np.max(np.abs(su_er)) > thresh:
          print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solu_xyz[n,:])
@@ -117,7 +117,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
    for n in range(solv_xyz.shape[0]):
       bf = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solv_xyz[n,:]))
       af = np.linalg.norm(np.subtract(solu_xyz_t[atom_center,:],solv_xyz_t[n,:]))
-      sv_er = (bf-af)/bf
+      su_er = (bf-af)/bf if bf > 0.0 else 0.0
       if np.max(np.abs(sv_er)) > thresh:
          print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solv_xyz[n,:])
