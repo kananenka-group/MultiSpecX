@@ -1,8 +1,9 @@
 import numpy as np
 import sys
+from typing import List
 
 
-def calcEf(atoms: list[int], xyz, xyz_ref, charges):
+def calcEf(atoms: List[int], xyz, xyz_ref, charges):
    """
       Caclulate electric fields on atoms and 
       optionally projections on selected vectors
@@ -76,7 +77,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
       throw in a warning message when coordiates are distorted by 
       1% (distance change w.r.t. reference atom)
    """
-   thresh=0.01
+   thresh: float =0.01
    solu_xyz_t = np.copy(solu_xyz)
    solv_xyz_t = np.copy(solv_xyz)
 
@@ -95,11 +96,11 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          atomp = item[2]-1
          va = np.subtract(solu_xyz_t[atomp,:],solu_xyz_t[atomn,:])
          if item[3].lower() == "z":
-            vb = np.array([0.0,0.0,1.0])
+            vb = np.array([0.0,0.0,1.0],dtype=np.float32)
          elif item[3].lower() == "y":
-            vb = np.array([0.0,1.0,0.0])
+            vb = np.array([0.0,1.0,0.0],dtype=np.float32)
          elif item[3].lower() == "x":
-            vb = np.array([1.0,0.0,0.0])
+            vb = np.array([1.0,0.0,0.0],dtype=np.float32)
          else:
             sys.exit(f" Cannot recognize the rotation axis {item[3]} can only be 'x', 'y', or 'z'") 
          Rot = rotation_matrix(va,vb) 
@@ -146,32 +147,6 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
             print(f"      The frames will be translated to put atom {self.solute[3][item[1]-1]}({item[1]}) at the center of the box.")
          if item[0].lower() == "rotate":
             print(f"      The frames will be rotated such that vector {self.solute[3][item[1]-1]}({item[1]}) -> {self.solute[3][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
-
- 
-   def SplitSolvent(self, solu_xyz, solv_xyz, box):
-      """
-         Split solvent molecules into 2 groups:
-         - explicit solvent 
-         - solvent to be used as point charges
-      """
-      # find reference atoms
-      sura = self.solute[1].index(self.solu_ref_atom)
-      svra = self.solvent[1].index(self.solv_ref_atom)
-      n_solv_atoms = len(self.solvent[1])
-      n_solv_mols  = solv_xyz.shape[0] // n_solv_atoms
-
-      sv_qm = []  
-      sv_pc = []
-      for n in range(n_solv_mols):
-         vnr = solv_xyz[n_solv_atoms*n+svra] - solu_xyz[sura,:]
-         vnn = minImage(vnr,box)      
-         dnn = np.sqrt(vnn.dot(vnn))
-         if dnn < self.cut_off2:
-            if dnn < self.cut_off1:
-               sv_qm.append(solv_xyz[n_solv_atoms*n:n_solv_atoms*n+n_solv_atoms,:])
-            else:
-               sv_pc.append(solv_xyz[n_solv_atoms*n:n_solv_atoms*n+n_solv_atoms,:])
-
 
 def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS) -> list[int]:
 
