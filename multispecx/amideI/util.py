@@ -10,6 +10,7 @@ def calcEf(atoms: list[int], xyz, xyz_ref, charges):
    assert xyz.shape[0] == len(charges), f" something is wrong in calcEf {xyz_ref.shape[0]} vs {len(charges)}"
 
    eF = np.zeros((len(atoms),3),dtype=np.float32)
+
    for atom in atoms:
       eFa = np.zeros((3))
       for ai in range(xyz.shape[0]):
@@ -234,14 +235,14 @@ def getInternalTransformXYZ(transform_in, atom_names, chrom_idx):
             tloc = []
             tloc.append('center')
             loc = atom_names.index(item[1])
-            tloc.append(loc+1) #chrom_idx_in[loc])
+            tloc.append(int(loc+1)) #chrom_idx_in[loc])
          elif item[0] == 'rotate':
             tloc = []
             tloc.append('rotate')
             loc1 = atom_names.index(item[1])
             loc2 = atom_names.index(item[2])
-            tloc.append(loc1+1) #chrom_idx_in[loc1])
-            tloc.append(loc2+1) #chrom_idx_in[loc2]) 
+            tloc.append(int(loc1)+1) #chrom_idx_in[loc1])
+            tloc.append(int(loc2)+1) #chrom_idx_in[loc2]) 
             tloc.append(item[3])
          this_chrom.append(tloc)
       transform_out.append(this_chrom)
