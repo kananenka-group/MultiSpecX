@@ -1,7 +1,8 @@
 import numpy as np
 import sys
 
-def calcEf(atoms, xyz, xyz_ref, charges):
+
+def calcEf(atoms: list[int], xyz, xyz_ref, charges):
    """
       Caclulate electric fields on atoms and 
       optionally projections on selected vectors
