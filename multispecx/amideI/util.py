@@ -148,7 +148,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          if item[0].lower() == "rotate":
             print(f"      The frames will be rotated such that vector {self.solute[3][item[1]-1]}({item[1]}) -> {self.solute[3][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
 
-def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS) -> list[int]:
+def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS):
 
    atoms_include:list(int) = []
    for n in range(xyz.shape[0]):
