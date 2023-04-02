@@ -8,7 +8,7 @@ def calcEf(atoms, xyz, xyz_ref, charges):
    """
    assert xyz.shape[0] == len(charges), f" something is wrong in calcEf {xyz_ref.shape[0]} vs {len(charges)}"
 
-   eF = np.zeros((len(atoms),3))
+   eF = np.zeros((len(atoms),3),dtype=np.float32)
    for atom in atoms:
       eFa = np.zeros((3))
       for ai in range(xyz.shape[0]):
@@ -49,13 +49,16 @@ def rotation_matrix(va, vb):
    s = v/np.linalg.norm(v)
    c = np.dot(uva,uvb)
 
+   fc: float 
+   indl: int 
+
    if c > -1.0:
       Vx = np.array([[    0, -v[2],   v[1]],
                      [ v[2],     0,  -v[0]],
-                     [-v[1],  v[0],      0]])
+                     [-v[1],  v[0],     0]],dtype=np.float32)
       Vx2 = Vx @ Vx
       fc = 1.0/(1.0 + c)
-      Rot = np.eye(3) + Vx + fc*Vx2
+      Rot = np.eye(3,dtype=np.float32) + Vx + fc*Vx2
    else:
       indl = np.where(uvb == 1.0)[0]
       Rot = np.eye(3)
@@ -67,6 +70,9 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
    """
       Here input coordinates for the solute and solvent will be
       transformed
+
+      throw in a warning message when coordiates are distorted by 
+      1% (distance change w.r.t. reference atom)
    """
    thresh=0.01
    solu_xyz_t = np.copy(solu_xyz)
@@ -117,7 +123,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
    for n in range(solv_xyz.shape[0]):
       bf = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solv_xyz[n,:]))
       af = np.linalg.norm(np.subtract(solu_xyz_t[atom_center,:],solv_xyz_t[n,:]))
-      su_er = (bf-af)/bf if bf > 0.0 else 0.0
+      sv_er = (bf-af)/bf if bf > 0.0 else 0.0
       if np.max(np.abs(sv_er)) > thresh:
          print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solv_xyz[n,:])
@@ -183,7 +189,7 @@ def getCOMChg(xyz, cgS, masses):
    nchg = len(cgS)-1
    natoms = len(masses)
 
-   com = np.zeros((nchg,3))
+   com = np.zeros((nchg,3),dtype=np.float32)
    for n in range(nchg):
      gs = cgS[n]
      ge = cgS[n+1]
@@ -211,7 +217,7 @@ def getCOM(xyz, mass):
    """
       Calculate center of mass
    """
-   com = np.zeros((3))
+   com = np.zeros((3),dtype=np.float32)
    tmas = np.sum(mass)
    for n in range(3):
       com[n] = np.sum(np.multiply(xyz[:,n],mass))/tmas
