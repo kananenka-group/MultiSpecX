@@ -16,7 +16,7 @@ def calcEf(atoms: List[int], xyz, xyz_ref, charges):
       eFa = np.zeros((3))
       for ai in range(xyz.shape[0]):
          vij = xyz[ai,:] - xyz_ref[atom,:]
-         vij *= 1.88973
+         vij *= 1.88973   # convert to a.u.
          dij = np.linalg.norm(vij)
          dij3 = dij**3
          eFa += vij*charges[ai]/dij3
@@ -77,7 +77,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
       throw in a warning message when coordiates are distorted by 
       1% (distance change w.r.t. reference atom)
    """
-   thresh: float =0.01
+   thresh: float = 0.01
    solu_xyz_t = np.copy(solu_xyz)
    solv_xyz_t = np.copy(solv_xyz)
 
@@ -121,7 +121,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solu_xyz[n,:])
          print(" After = ",solu_xyz_t[n,:])
-         print(f" Error (w.r.t. solute reference atom {atom_center}) = {100*sv_er} %")
+         print(f" Error (w.r.t. solute reference atom {atom_center}) = {100*sv_er} %.")
 
    for n in range(solv_xyz.shape[0]):
       bf = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solv_xyz[n,:]))
@@ -131,7 +131,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solv_xyz[n,:])
          print(" After = ",solv_xyz_t[n,:])
-         print(f" Error (w.r.t. solute reference atom {atom_center})= {100*sv_er} %")
+         print(f" Error (w.r.t. solute reference atom {atom_center}) = {100*sv_er} %.")
 
    return solu_xyz_t, solv_xyz_t
 
@@ -157,7 +157,7 @@ def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS):
          atoms_include.extend(atoms)
    [ atoms_include.remove(atr) for atr in atoms_exclude ]
    
-   return np.asarray(atoms_include,dtype=int)
+   return np.asarray(atoms_include,dtype=np.int32)
 
 def getCOMChg(xyz, cgS, masses):
    """
@@ -184,7 +184,7 @@ def centerBox(xyz, ref, box):
    """
    xyzc = np.copy(xyz)
 
-   shift = np.subtract(ref,box/2)
+   shift = np.subtract(ref,box/2.0)
    for n in range(xyzc.shape[0]):
       xyzc[n,:] = inBox(np.subtract(xyzc[n,:],shift),box)
 

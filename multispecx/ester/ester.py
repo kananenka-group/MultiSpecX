@@ -60,7 +60,7 @@ class Ester:
      print(f" >>>>> Reading frames from {self.xtc} file") 
      print(f"       Total number of frames to read: {nframes}")
 
-     w_avg=0.0
+     w_avg: float = 0.0
      for frame in range(nframes):
         xyz_raw = 10.0*t.xyz[frame,:,:]
         box     = 10.0*t.unitcell_lengths[frame,:]
@@ -94,5 +94,7 @@ class Ester:
            w_avg += w
           
            Energy[frame,chind,chind] = w
+
+           # calc. transition dipole location
      
      print (f" Average frequency {w_avg/(len(chrom_idx)*(frame+1))}")
