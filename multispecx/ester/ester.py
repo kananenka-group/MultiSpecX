@@ -6,13 +6,13 @@ from ..amideI import *
 
 @dataclass
 class Ester:
+   nframes: int = None
    type: list = field(default_factory=lambda: ['dipole'])
    itp: list = field(default_factory=lambda: ['topol.itp'])
    ester_unit: list = field(default_factory=lambda: ['C','O','C','O'])
    gro:  str = "confout.gro"
    xtc:  str = "traj.xtc" 
    top:  str = "topology.top"
-   nframes: int = 1
    isotope_labels: list = field(default_factory=lambda: [])
    transform: list = field(default_factory=lambda: [])
    start: int = 1
@@ -54,17 +54,21 @@ class Ester:
      t = md.load(self.xtc, top=self.gro)
      nframes = t.xyz.shape[0]
 
-     # 
-     Energy = np.zeros((nframes,len(chrom_idx),len(chrom_idx)),dtype=np.float32)  
+     if not self.nframes:
+        self.nframes = nframes
+
+     Energy = np.zeros((self.nframes,len(chrom_idx),len(chrom_idx)),dtype=np.float32)  
+     Dipole = np.zeros((self.nframes,len(chrom_idx),3),dtype=np.float32)
 
      print(f" >>>>> Reading frames from {self.xtc} file") 
-     print(f"       Total number of frames to read: {nframes}")
+     print(f"       Total number of frames to read: {self.nframes}")
 
      w_avg: float = 0.0
-     for frame in range(nframes):
+     for frame in range(self.nframes):
         xyz_raw = 10.0*t.xyz[frame,:,:]
         box     = 10.0*t.unitcell_lengths[frame,:]
 
+        TDC_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
         # loop over all chromphores
         for chind, chrom in enumerate(chrom_idx):
 
@@ -89,12 +93,18 @@ class Ester:
            efc, efp = calcEf(ef_atoms_num, envr_t, ester_t, charges[atoms_include])
            
            # map goes here
-           w0 = 1745.0
-           w = w0 + 1967.6*efc[0,0] - 640.4*efc[0,1] - 835.4*efc[0,2] + 1154.6*efc[1,0] - 1964.2*efc[1,1] -2776.0*efc[2,1]
+           Baiz_map = np.array([1967.6, -640.4, -835.4, 1154.6, -1964.2, 0.0, 0.0, -2776.0, 0.0])
+           w = 1745.0 + 1967.6*efc[0,0] - 640.4*efc[0,1] - 835.4*efc[0,2] + 1154.6*efc[1,0] - 1964.2*efc[1,1] -2776.0*efc[2,1]
+           #w = 1745.0 + self.freq_shift + np.multiply(Baiz_map, efc)
            w_avg += w
           
            Energy[frame,chind,chind] = w
 
-           # calc. transition dipole location
+           # calc. transition dipole vector for this chrom.
+           TDC_f[chind,:] = self.ester_TDC(ester_t)
      
      print (f" Average frequency {w_avg/(len(chrom_idx)*(frame+1))}")
+
+   def ester_TDC(self,xyz):
+      tdcv = np.zeros((3))
+      return tdcv
