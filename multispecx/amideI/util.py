@@ -4,9 +4,35 @@ import sys
 from datetime import datetime
 from typing import List
 
+def printEnergy(Energy):
+ 
+   for frame in range(Energy.shape[0]):
+     en_frame = Energy[frame,:,:][np.triu_indices(3)]
+     print (en_frame)
+   ddd
+
+def minImage(v, box):
+   return v - np.multiply(box,np.rint(np.divide(v,box)))
 
 def printDT(pt):
    print(f" >>>>> Simulation {pt}: {datetime.today():%B %d, %Y %H:%M:%S}") 
+
+def TDC(tdv_i, tdv_j, tdp_i, tdp_j) -> float:
+   """
+      Calculate transition dipole coupling in cm-1
+ 
+      scale = 51.43145 is 84861.9/1650 to convert to cm-1
+      the dielectric constant of the medium (epsilon) is taken to be 1
+   """
+   A0INV = 18.89726125
+   tdMag = 2.1
+   scale = 383.313*A0INV*A0INV*A0INV/(1000*tdMag*tdMag)
+   rij = tdp_i - tdp_j
+   dij = 1.0/np.linalg.norm(rij)
+   dij3 = dij**3
+   dij5 = dij3*dij*dij
+   omega = dij3*np.dot(tdv_i,tdv_j) - 3.0*dij5*np.dot(tdv_i,rij)*np.dot(tdv_j,rij)
+   return omega*scale
 
 def calcEf(atoms: List[int], xyz, xyz_ref, charges):
    """
