@@ -21,7 +21,8 @@ def calcEf(atoms: List[int], xyz, xyz_ref, charges):
          dij3 = dij**3
          eFa += vij*charges[ai]/dij3
       eF[atom,:] = np.copy(eFa) 
-   return eF, eF
+   # make it 1D for the electric field
+   return np.reshape(eF,(len(atoms*3))), eF
 
 def rotation_matrix(va, vb):
    """

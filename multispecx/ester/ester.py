@@ -93,9 +93,8 @@ class Ester:
            efc, efp = calcEf(ef_atoms_num, envr_t, ester_t, charges[atoms_include])
            
            # map goes here
-           Baiz_map = np.array([1967.6, -640.4, -835.4, 1154.6, -1964.2, 0.0, 0.0, -2776.0, 0.0])
-           w = 1745.0 + 1967.6*efc[0,0] - 640.4*efc[0,1] - 835.4*efc[0,2] + 1154.6*efc[1,0] - 1964.2*efc[1,1] -2776.0*efc[2,1]
-           #w = 1745.0 + self.freq_shift + np.multiply(Baiz_map, efc)
+           map_w0: float = 1745.0
+           w = Baiz_map_w0 + self.freq_shift + np.dot(Baiz_map, efc)
            w_avg += w
           
            Energy[frame,chind,chind] = w
@@ -105,7 +104,7 @@ class Ester:
      
      print (f" Average frequency {w_avg/(len(chrom_idx)*(frame+1))}")
 
-   def ester_TDC(self,xyz):
+   def ester_TDC(self, xyz):
       """
          Here we will use TD for the ester developed by Lu Wang in J. Chem. Phys. 153, 035101 (2020)
          see also Wei Zhuang paper
