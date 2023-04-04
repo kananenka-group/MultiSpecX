@@ -106,5 +106,9 @@ class Ester:
      print (f" Average frequency {w_avg/(len(chrom_idx)*(frame+1))}")
 
    def ester_TDC(self,xyz):
+      """
+         Here we will use TD for the ester developed by Lu Wang in J. Chem. Phys. 153, 035101 (2020)
+         see also Wei Zhuang paper
+      """
       tdcv = np.zeros((3))
       return tdcv
