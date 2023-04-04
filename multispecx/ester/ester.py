@@ -1,4 +1,5 @@
 import mdtraj as md
+import time
 from ..system import *
 from dataclasses import dataclass, field
 
@@ -21,9 +22,10 @@ class Ester:
    freq_shift: float = 0.0
 
    def generateHamiltonian(self): 
-     printDT("begins")
+     start_time = time.perf_counter()
+     printDT("starts")
 
-     emap_cut = 20.0
+     emap_cut = 2.0*18.89726125
 
      # create a system object
      s = System(self.itp,self.top,self.gro)
@@ -66,16 +68,22 @@ class Ester:
      print(f"       Total number of frames to read: {self.nframes}")
 
      w_avg: float = 0.0
-     for frame in range(self.nframes):
-        xyz_raw = 10.0*t.xyz[frame,:,:]
-        box     = 10.0*t.unitcell_lengths[frame,:]
 
-        TDC_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
+     for frame in range(self.nframes):
+        xyz_raw = 18.89726125*t.xyz[frame,:,:]
+        box     = 18.89726125*t.unitcell_lengths[frame,:]
+
+        tdv_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
+        tdp_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
         # loop over all chromphores
         for chind, chrom in enumerate(chrom_idx):
 
-           # re-center box at the COM of selected atoms
            xyz_chrom_raw = xyz_raw[chrom,:]
+
+           # calculate transition dipole moments before we do anything with the box
+           tdv_f[chind,:], tdp_f[chind,:] = self.ester_TDC_Wang20(xyz_chrom_raw, box)
+
+           # re-center box at the COM of selected atoms
            com_raw = getCOM(xyz_chrom_raw, masses[chrom])
            xyz = centerBox(xyz_raw, com_raw, box)
            xyz_chrom = xyz[chrom,:]
@@ -102,15 +110,46 @@ class Ester:
           
            Energy[frame,chind,chind] = w
 
-           # calc. transition dipole vector for this chrom.
-           TDC_f[chind,:] = self.ester_TDC(ester_t)
-     
+        # calculate TDC:
+        for i1 in range(len(chrom_idx)):
+           for i2 in range(i1):
+              Energy[frame,i1,i2] = Energy[frame,i2,i1] = TDC(tdv_f[i1], tdv_f[i2], tdp_f[i1], tdp_f[i2])
+    
+     # print into file
+     printEnergy(Energy) 
      print (f" Average frequency {w_avg/(len(chrom_idx)*(frame+1))}")
+     
+     # finish here
+     end_time = time.perf_counter()
+     print(f" >>>>> The execution time: {(end_time - start_time)/60:.1f} minutes")
+     printDT("ends")
 
-   def ester_TDC(self, xyz):
+   def ester_TDC_Wang20(self, xyz, box):
       """
          Here we will use TD for the ester developed by Lu Wang in J. Chem. Phys. 153, 035101 (2020)
          see also Wei Zhuang paper
       """
-      tdcv = np.zeros((3))
-      return tdcv
+      tdAngle: float = 15.1*np.pi/180.0
+      tdMag: float   = 2.10   # units are D*A^{-1}*u^{-1/2}, u is a.m.u.
+
+      vcod = minImage(np.subtract(xyz[1,:],xyz[0,:]),box)
+      vcoe = minImage(np.subtract(xyz[2,:],xyz[0,:]),box)
+
+      vC = np.linalg.norm(vcod)
+
+      vcod /= np.linalg.norm(vcod)
+      vcoe /= np.linalg.norm(vcoe)
+
+      n1  = np.cross(vcod,vcoe)
+      n2  = np.cross(n1,vcod)
+      n2 /= np.linalg.norm(n2) 
+
+      tdv  = np.sin(tdAngle)*n2 - np.cos(tdAngle)*vcod
+      tdv /= np.linalg.norm(tdv)
+      tdv *= tdMag
+
+      # td position is midway CO bond, see Lu Wang paper
+      tdp = xyz[0,:] + 0.5*vcod*vC
+ 
+      return tdv, tdp
+
