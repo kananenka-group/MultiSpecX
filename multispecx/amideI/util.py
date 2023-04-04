@@ -1,7 +1,12 @@
 import numpy as np
 import sys
+
+from datetime import datetime
 from typing import List
 
+
+def printDT(pt):
+   print(f" >>>>> Simulation {pt}: {datetime.today():%B %d, %Y %H:%M:%S}") 
 
 def calcEf(atoms: List[int], xyz, xyz_ref, charges):
    """
