@@ -21,6 +21,8 @@ class Ester:
    freq_shift: float = 0.0
 
    def generateHamiltonian(self): 
+     printDT("begins")
+
      emap_cut = 20.0
 
      # create a system object
@@ -94,7 +96,8 @@ class Ester:
            
            # map goes here
            map_w0: float = 1745.0
-           w = Baiz_map_w0 + self.freq_shift + np.dot(Baiz_map, efc)
+           Elst_map = np.array([1967.6, -640.4, -835.4, 1154.6, -1964.2, 0.0, 0.0, -2776.0, 0.0])
+           w = map_w0 + self.freq_shift + np.dot(Elst_map, efc)
            w_avg += w
           
            Energy[frame,chind,chind] = w
