@@ -22,7 +22,7 @@ class Ester:
    freq_shift: float = 0.0
 
    def generateHamiltonian(self): 
-     start_time = time.perf_counter()
+     start_time = time.time()
      printDT("starts")
 
      emap_cut = 2.1*NMTOAU
@@ -120,7 +120,7 @@ class Ester:
      print (f" Average frequency {w_avg/(len(chrom_idx)*(frame+1))}")
      
      # finish here
-     end_time = time.perf_counter()
+     end_time = time.time()
      print(f" >>>>> The execution time: {(end_time - start_time)/60:.1f} minutes")
      printDT("ends")
 
