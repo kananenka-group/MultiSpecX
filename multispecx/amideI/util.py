@@ -27,12 +27,10 @@ def TDC(tdv_i, tdv_j, tdp_i, tdp_j) -> float:
    """
       Calculate transition dipole coupling in cm-1
  
-      scale = 51.43145 is 84861.9/1650 to convert to cm-1
-      the dielectric constant of the medium (epsilon) is taken to be 1
    """
-   A0INV = 18.89726125
+   #A0INV = 18.89726125
    tdMag = 2.1
-   scale = 383.313*A0INV*A0INV*A0INV/(1000*tdMag*tdMag)
+   scale = 383.313*NMTOAU*NMTOAU*NMTOAU/(1000*tdMag*tdMag)
    rij = tdp_j - tdp_i
    dij = 1.0/np.linalg.norm(rij)
    dij3 = dij**3
