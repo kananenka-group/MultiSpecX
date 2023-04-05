@@ -6,6 +6,15 @@ from typing import List
 
 from .constants import *
 
+def printDipole(Dipole):
+   """
+      Print transition dipoles
+   """
+   row_n = np.arange(0,Dipole.shape[0],dtype=np.int32)
+   fmt = ["%.7f"]*Dipole.shape[1]
+   fmt.insert(0,"%i")
+   np.savetxt("Dipole.txt",np.column_stack((row_n,Dipole)),fmt=fmt)
+
 def printEnergy(Energy):
  
    n: int = Energy.shape[1]*(Energy.shape[1]+1)//2
