@@ -62,12 +62,10 @@ class Ester:
         self.nframes = nframes
 
      Energy = np.zeros((self.nframes,len(chrom_idx),len(chrom_idx)),dtype=np.float32)  
-     Dipole = np.zeros((self.nframes,len(chrom_idx),3),dtype=np.float32)
+     Dipole = np.zeros((self.nframes,len(chrom_idx)*3),dtype=np.float32)
 
      print(f" >>>>> Reading frames from {self.xtc} file") 
      print(f"       Total number of frames to read: {self.nframes}")
-
-     w_avg: float = 0.0
 
      for frame in range(self.nframes):
         xyz_raw = NMTOAU*t.xyz[frame,:,:]
@@ -82,6 +80,7 @@ class Ester:
 
            # calculate transition dipole moments before we do anything with the box
            tdv_f[chind,:], tdp_f[chind,:] = self.ester_TDC_Wang20(xyz_chrom_raw, box)
+           Dipole[frame,3*chind:3*chind+3] = np.copy(tdv_f[chind,:])
 
            # re-center box at the COM of selected atoms
            com_raw = getCOM(xyz_chrom_raw, masses[chrom])
@@ -106,7 +105,6 @@ class Ester:
            map_w0: float = 1745.0
            Elst_map = np.array([1967.6, -640.4, -835.4, 1154.6, -1964.2, 0.0, 0.0, -2776.0, 0.0])
            w = map_w0 + self.freq_shift + np.dot(Elst_map, efc)
-           w_avg += w
           
            Energy[frame,chind,chind] = w
 
@@ -115,9 +113,9 @@ class Ester:
            for i2 in range(i1):
               Energy[frame,i1,i2] = Energy[frame,i2,i1] = TDC(tdv_f[i1], tdv_f[i2], tdp_f[i1], tdp_f[i2])
     
-     # print into file
+     # print Hamiltonian into file
      printEnergy(Energy) 
-     print (f" Average frequency {w_avg/(len(chrom_idx)*(frame+1))}")
+     printDipole(Dipole)
      
      # finish here
      end_time = time.time()
