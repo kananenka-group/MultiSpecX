@@ -6,10 +6,16 @@ from typing import List
 
 def printEnergy(Energy):
  
+   n: int = Energy.shape[1]*(Energy.shape[1]+1)//2
+   Energy_out = np.zeros((Energy.shape[0],n),dtype=np.float32)
+
    for frame in range(Energy.shape[0]):
-     en_frame = Energy[frame,:,:][np.triu_indices(3)]
-     print (en_frame)
-   ddd
+      Energy_out[frame,:] = Energy[frame,:,:][np.triu_indices(Energy.shape[1])]
+   
+   row_n = np.arange(0,Energy.shape[0],dtype=np.int32)
+   fmt = ["%.7f"]*n 
+   fmt.insert(0,"%i")
+   np.savetxt("Energy.txt",np.column_stack((row_n,Energy_out)),fmt=fmt)
 
 def minImage(v, box):
    return v - np.multiply(box,np.rint(np.divide(v,box)))
@@ -27,7 +33,7 @@ def TDC(tdv_i, tdv_j, tdp_i, tdp_j) -> float:
    A0INV = 18.89726125
    tdMag = 2.1
    scale = 383.313*A0INV*A0INV*A0INV/(1000*tdMag*tdMag)
-   rij = tdp_i - tdp_j
+   rij = tdp_j - tdp_i
    dij = 1.0/np.linalg.norm(rij)
    dij3 = dij**3
    dij5 = dij3*dij*dij
