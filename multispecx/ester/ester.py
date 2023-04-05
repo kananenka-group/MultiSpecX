@@ -25,7 +25,7 @@ class Ester:
      start_time = time.perf_counter()
      printDT("starts")
 
-     emap_cut = 2.0*18.89726125
+     emap_cut = 2.1*NMTOAU
 
      # create a system object
      s = System(self.itp,self.top,self.gro)
@@ -70,8 +70,8 @@ class Ester:
      w_avg: float = 0.0
 
      for frame in range(self.nframes):
-        xyz_raw = 18.89726125*t.xyz[frame,:,:]
-        box     = 18.89726125*t.unitcell_lengths[frame,:]
+        xyz_raw = NMTOAU*t.xyz[frame,:,:]
+        box     = NMTOAU*t.unitcell_lengths[frame,:]
 
         tdv_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
         tdp_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
