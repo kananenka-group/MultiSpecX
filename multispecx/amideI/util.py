@@ -4,6 +4,8 @@ import sys
 from datetime import datetime
 from typing import List
 
+from .constants import *
+
 def printEnergy(Energy):
  
    n: int = Energy.shape[1]*(Energy.shape[1]+1)//2
