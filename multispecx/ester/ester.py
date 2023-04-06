@@ -18,14 +18,13 @@ class Ester:
    transform: list = field(default_factory=lambda: [])
    start: int = 1
    elFmap: str  = "Baiz2016"
-   
    freq_shift: float = 0.0
 
    def generateHamiltonian(self): 
      start_time = time.time()
      printDT("starts")
 
-     emap_cut = 2.1*NMTOAU
+     emap_cut = 21*ATOAU
 
      # create a system object
      s = System(self.itp,self.top,self.gro)
