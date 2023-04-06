@@ -34,7 +34,7 @@ def printEnergy(Energy):
    print(f" >>>>> Hamiltonian has been saved to Energy.txt file.")
 
 def minImage(v, box):
-   return v - np.multiply(box,np.rint(np.divide(v,box)))
+   return v - np.multiply(box,np.round(np.divide(v,box)))
 
 def printDT(pt):
    print(f" >>>>> Simulation {pt}: {datetime.today():%B %d, %Y %H:%M:%S}") 
