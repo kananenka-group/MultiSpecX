@@ -79,7 +79,7 @@ class Ester:
            xyz_chrom_raw = xyz_raw[chrom,:]
 
            # calculate transition dipole moments before we do anything with the box
-           tdv_f[chind,:], tdp_f[chind,:] = self.ester_TDC_Wang20(xyz_chrom_raw, box)
+           tdv_f[chind,:], tdp_f[chind,:], tdMag = self.ester_TDC_Wang20(xyz_chrom_raw, box)
            Dipole[frame,3*chind:3*chind+3] = np.copy(tdv_f[chind,:])
 
            # re-center box at the COM of selected atoms
@@ -111,7 +111,7 @@ class Ester:
         # calculate TDC:
         for i1 in range(len(chrom_idx)):
            for i2 in range(i1):
-              Energy[frame,i1,i2] = Energy[frame,i2,i1] = TDC(tdv_f[i1], tdv_f[i2], tdp_f[i1], tdp_f[i2])
+              Energy[frame,i1,i2] = Energy[frame,i2,i1] = TDC(tdv_f[i1], tdv_f[i2], tdp_f[i1], tdp_f[i2], tdMag)
     
      # print Hamiltonian into file
      printEnergy(Energy) 
@@ -149,5 +149,5 @@ class Ester:
       # td position is midway CO bond, see Lu Wang paper
       tdp = xyz[0,:] + 0.5*vcod*vC
  
-      return tdv, tdp
+      return tdv, tdp, tdMag
 
