@@ -231,7 +231,7 @@ def inBox(v, box):
 
 def centerBox(xyz, ref, box):
    """
-      Center simulation box at a given loc.
+      Center simulation box at a given location
    """
    xyzc = np.copy(xyz)
 
@@ -267,8 +267,8 @@ def getInternalTransformXYZ(transform_in, atom_names, chrom_idx):
             tloc.append('rotate')
             loc1 = atom_names.index(item[1])
             loc2 = atom_names.index(item[2])
-            tloc.append(int(loc1)+1) #chrom_idx_in[loc1])
-            tloc.append(int(loc2)+1) #chrom_idx_in[loc2]) 
+            tloc.append(int(loc1)+1) 
+            tloc.append(int(loc2)+1) 
             tloc.append(item[3])
          this_chrom.append(tloc)
       transform_out.append(this_chrom)
@@ -321,7 +321,7 @@ def chromList(isotope_labels, search_unit, atoms, atoms_in_mol):
 
 def getIndex(a_unit, isotope_labels, res_num, res_nam, atm_nam):
    """
-      This function will return starting index of all chromophores.
+      This function will return the starting index of all chromophores.
    """
    natoms = len(atm_nam)
    nfind  = len(a_unit)
