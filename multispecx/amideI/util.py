@@ -117,7 +117,18 @@ def rotation_matrix(va, vb):
       Rot[:,indl] *=-1
 
    return Rot
- 
+
+def CartDir(inp: str):
+   match inp:
+      case "x":
+         return np.array([1.0,0.0,0.0],dtype=np.float32)
+      case "y":
+         return np.array([0.0,1.0,0.0],dtype=np.float32)
+      case "z":
+         return np.array([0.0,0.0,1.0],dtype=np.float32)
+      case _:
+         raise ValueError (f" Cannot recognize the rotation axis {inp} can only be 'x', 'y', or 'z'") 
+
 def transformXYZ(transform, solu_xyz, solv_xyz):
    """
       Here input coordinates for the solute and solvent will be
@@ -144,14 +155,17 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          atomn = item[1]-1
          atomp = item[2]-1
          va = np.subtract(solu_xyz_t[atomp,:],solu_xyz_t[atomn,:])
-         if item[3].lower() == "z":
-            vb = np.array([0.0,0.0,1.0],dtype=np.float32)
-         elif item[3].lower() == "y":
-            vb = np.array([0.0,1.0,0.0],dtype=np.float32)
-         elif item[3].lower() == "x":
-            vb = np.array([1.0,0.0,0.0],dtype=np.float32)
-         else:
-            sys.exit(f" Cannot recognize the rotation axis {item[3]} can only be 'x', 'y', or 'z'") 
+         vb = CartDir(item[3].lower())
+
+         #if item[3].lower() == "z":
+         #   vb = np.array([0.0,0.0,1.0],dtype=np.float32)
+         #elif item[3].lower() == "y":
+         #   vb = np.array([0.0,1.0,0.0],dtype=np.float32)
+         #elif item[3].lower() == "x":
+         #   vb = np.array([1.0,0.0,0.0],dtype=np.float32)
+         #else:
+         #   sys.exit(f" Cannot recognize the rotation axis {item[3]} can only be 'x', 'y', or 'z'") 
+
          Rot = rotation_matrix(va,vb) 
          # rotate all atoms here ...
          for n in range(solu_xyz_t.shape[0]):
