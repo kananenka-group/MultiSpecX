@@ -10,7 +10,7 @@ class Ester:
    nframes: int = None
    type: list = field(default_factory=lambda: ['dipole'])
    itp: list = field(default_factory=lambda: ['topol.itp'])
-   ester_unit: list = field(default_factory=lambda: ['C','O','C','O'])
+   ester_unit: list = field(default_factory=lambda: ['C','O','OE','CA'])
    gro:  str = "confout.gro"
    xtc:  str = "traj.xtc" 
    top:  str = "topology.top"
@@ -24,7 +24,7 @@ class Ester:
      start_time = time.time()
      printDT("starts")
 
-     emap_cut = 21*ATOAU
+     emap_cut = 21.0 #this is in A *ATOAU
 
      # create a system object
      s = System(self.itp,self.top,self.gro)
@@ -40,14 +40,14 @@ class Ester:
         [print (f"       {id} in {molid[0]} ") for (id,molid) in zip(n_ester_mol,self.molecules) if id>0]
 
      # determine where charge groups start
-     cgO = chargeGroupSt(self.atoms)
-     cgS = np.append(cgO,[len(self.atoms)])
+     cgS = chargeGroupSt(self.atoms)
+     #cgS = np.append(cgO,[len(self.atoms)])
 
      # build coordiate transformation here
      self.transform_internal = getInternalTransformXYZ(self.transform, self.ester_unit, chrom_idx)
 
      # figure out how to use map:
-     #self.getMap()
+     map_w0, Elst_map, ef_atoms, ef_proj = self.getMap()
 
      # prepare some variables for fast processing
      charges = np.asarray([ x[6] for x in self.atoms ],dtype=np.float32)
@@ -67,8 +67,8 @@ class Ester:
      print(f"       Total number of frames to read: {self.nframes}")
 
      for frame in range(self.nframes):
-        xyz_raw = NMTOAU*t.xyz[frame,:,:]
-        box     = NMTOAU*t.unitcell_lengths[frame,:]
+        xyz_raw = 10.0*t.xyz[frame,:,:]  #NMTOAU*t.xyz[frame,:,:]
+        box     = 10.0*t.unitcell_lengths[frame,:] #NMTOAU*t.unitcell_lengths[frame,:]
 
         tdv_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
         tdp_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
@@ -98,18 +98,15 @@ class Ester:
            ester_t, envr_t = transformXYZ(self.transform_internal[chind], xyz_chrom, xyz[atoms_include,:])
 
            # calculate electric field components at selected atoms
-           ef_atoms_num = [0, 1, 2] 
-           efc, efp = calcEf(ef_atoms_num, envr_t, ester_t, charges[atoms_include])
+           efc, efp = calcEf(ef_atoms, ef_proj, envr_t, ester_t, charges[atoms_include])
            
            # map goes here
-           map_w0: float = 1745.0
-           Elst_map = np.array([1967.6, -640.4, -835.4, 1154.6, -1964.2, 0.0, 0.0, -2776.0, 0.0])
            Energy[frame,chind,chind] = map_w0 + self.freq_shift + np.dot(Elst_map, efc)
           
         # calculate TDC:
         for i1 in range(len(chrom_idx)):
            for i2 in range(i1):
-              Energy[frame,i1,i2] = Energy[frame,i2,i1] = TDC(tdv_f[i1], tdv_f[i2], tdp_f[i1], tdp_f[i2], tdMag)
+              Energy[frame,i1,i2] = Energy[frame,i2,i1] = TDC(tdv_f[i1], tdv_f[i2], tdp_f[i1], tdp_f[i2], tdMag, box)
     
      # print Hamiltonian into file
      printEnergy(Energy) 
@@ -149,3 +146,21 @@ class Ester:
  
       return tdv, tdp, tdMag
 
+   def getMap(self):
+      """
+         Return map 
+      """
+      map_w0: float
+      ef_atoms = []
+      ef_projection = []   
+      Elst_map = []
+
+      if self.elFmap == "Baiz2016":
+         map_w0 = 1745.0
+         Elst_map = [1967.6, -640.4, -835.4, 1154.6, -1964.2, 0.0, 0.0, -2776.0, 0.0]
+         ef_atoms = [0, 1, 2]
+         ef_projection = []
+      else:
+         sys.exit(f" Only Baiz 2016 map is currently implemented.")
+
+      return map_w0, np.array(Elst_map,dtype=np.float32), ef_atoms, ef_projection
