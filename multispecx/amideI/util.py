@@ -65,7 +65,6 @@ def calcEf(atoms: List[int], xyz, xyz_ref, charges):
       eFa = np.zeros((3))
       for ai in range(xyz.shape[0]):
          vij = xyz[ai,:] - xyz_ref[atom,:]
-         vij *= 1.88973   # convert to a.u.
          dij = np.linalg.norm(vij)
          dij3 = dij**3
          eFa += vij*charges[ai]/dij3
