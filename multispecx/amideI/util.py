@@ -198,14 +198,16 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
             print(f"      The frames will be rotated such that vector {self.solute[3][item[1]-1]}({item[1]}) -> {self.solute[3][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
 
 def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS):
-
+   """
+      Make a list of atoms that are close enough to be
+      included into electric field calculation
+   """
    atoms_include:list(int) = []
    for n in range(xyz.shape[0]):
       if np.linalg.norm(xyz[n,:]-xyz_ref) < cut:
          atoms = list(range(cgS[n],cgS[n+1]))
          atoms_include.extend(atoms)
    [ atoms_include.remove(atr) for atr in atoms_exclude ]
-   
    return np.asarray(atoms_include,dtype=np.int32)
 
 def getCOMChg(xyz, cgS, masses):
