@@ -39,20 +39,20 @@ def minImage(v, box):
 def printDT(pt):
    print(f" >>>>> Simulation {pt}: {datetime.today():%B %d, %Y %H:%M:%S}") 
 
-def TDC(tdv_i, tdv_j, tdp_i, tdp_j, tdMag) -> float:
+def TDC(tdv_i, tdv_j, tdp_i, tdp_j, tdMag, box) -> float:
    """
       Calculate transition dipole coupling in cm-1
  
    """
-   scale: float = 383.313*NMTOAU*NMTOAU*NMTOAU/(1000*tdMag*tdMag)
-   rij = tdp_j - tdp_i
+   scale: float = 84861.9/1650 #383.313*NMTOAU*NMTOAU*NMTOAU/(1000*tdMag*tdMag)
+   rij = minImage(tdp_j - tdp_i,box)
    dij = 1.0/np.linalg.norm(rij)
    dij3 = dij**3
    dij5 = dij3*dij*dij
    omega = dij3*np.dot(tdv_i,tdv_j) - 3.0*dij5*np.dot(tdv_i,rij)*np.dot(tdv_j,rij)
    return omega*scale
 
-def calcEf(atoms: List[int], xyz, xyz_ref, charges):
+def calcEf(atoms: List[int], projections, xyz, xyz_ref, charges):
    """
       Caclulate electric fields on atoms and 
       optionally projections on selected vectors
@@ -66,11 +66,18 @@ def calcEf(atoms: List[int], xyz, xyz_ref, charges):
       for ai in range(xyz.shape[0]):
          vij = xyz[ai,:] - xyz_ref[atom,:]
          dij = np.linalg.norm(vij)
+         dij *= ATOAU
          dij3 = dij**3
          eFa += vij*charges[ai]/dij3
       eF[atom,:] = np.copy(eFa) 
    # make it 1D for the electric field
-   return np.reshape(eF,(len(atoms*3))), eF
+
+   # projections:
+   eFp = np.zeros((len(projections)),dtype=np.float32)
+   for proja in projections:
+      ...
+
+   return np.reshape(eF,(len(atoms*3))), eFp
 
 def rotation_matrix(va, vb):
    """
@@ -217,6 +224,7 @@ def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS):
       included into electric field calculation
    """
    atoms_include:list(int) = []
+
    for n in range(xyz.shape[0]):
       if np.linalg.norm(xyz[n,:]-xyz_ref) < cut:
          atoms = list(range(cgS[n],cgS[n+1]))
@@ -305,7 +313,10 @@ def chargeGroupSt(atoms):
             chg.append(mol_idx)
       else:
          chg.append(mol_idx)
-   return np.asarray(chg,dtype=int)
+   # add the last atom to terminate the count
+   chg.append(len(atoms))
+
+   return np.asarray(chg,dtype=np.int32)
 
 def chromList(isotope_labels, search_unit, atoms, atoms_in_mol):
 
