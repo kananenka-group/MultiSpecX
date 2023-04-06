@@ -72,6 +72,7 @@ class Ester:
 
         tdv_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
         tdp_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
+
         # loop over all chromphores
         for chind, chrom in enumerate(chrom_idx):
 
@@ -103,10 +104,8 @@ class Ester:
            # map goes here
            map_w0: float = 1745.0
            Elst_map = np.array([1967.6, -640.4, -835.4, 1154.6, -1964.2, 0.0, 0.0, -2776.0, 0.0])
-           w = map_w0 + self.freq_shift + np.dot(Elst_map, efc)
+           Energy[frame,chind,chind] = map_w0 + self.freq_shift + np.dot(Elst_map, efc)
           
-           Energy[frame,chind,chind] = w
-
         # calculate TDC:
         for i1 in range(len(chrom_idx)):
            for i2 in range(i1):
@@ -118,7 +117,7 @@ class Ester:
      
      # finish here
      end_time = time.time()
-     print(f" >>>>> The execution time: {(end_time - start_time)/60:.1f} minutes")
+     print(f" >>>>> Execution time: {(end_time - start_time)/60:.1f} minutes")
      printDT("ends")
 
    def ester_TDC_Wang20(self, xyz, box):
