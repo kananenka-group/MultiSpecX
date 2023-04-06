@@ -39,14 +39,12 @@ def minImage(v, box):
 def printDT(pt):
    print(f" >>>>> Simulation {pt}: {datetime.today():%B %d, %Y %H:%M:%S}") 
 
-def TDC(tdv_i, tdv_j, tdp_i, tdp_j) -> float:
+def TDC(tdv_i, tdv_j, tdp_i, tdp_j, tdMag) -> float:
    """
       Calculate transition dipole coupling in cm-1
  
    """
-   #A0INV = 18.89726125
-   tdMag = 2.1
-   scale = 383.313*NMTOAU*NMTOAU*NMTOAU/(1000*tdMag*tdMag)
+   scale: float = 383.313*NMTOAU*NMTOAU*NMTOAU/(1000*tdMag*tdMag)
    rij = tdp_j - tdp_i
    dij = 1.0/np.linalg.norm(rij)
    dij3 = dij**3
