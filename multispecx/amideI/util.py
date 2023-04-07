@@ -229,7 +229,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solu_xyz[n,:])
          print(" After = ",solu_xyz_t[n,:])
-         warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {100*sv_er} %.")
+         warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {(100*su_er):.2f} %.")
 
    for n in range(solv_xyz.shape[0]):
       bf = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solv_xyz[n,:]))
@@ -239,7 +239,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solv_xyz[n,:])
          print(" After = ",solv_xyz_t[n,:])
-         warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {100*sv_er} %.")
+         warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {(100*sv_er):.2f} %.")
 
    return solu_xyz_t, solv_xyz_t
 
