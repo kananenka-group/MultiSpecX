@@ -6,21 +6,22 @@ from typing import List
 
 from .constants import *
 
-def printDipole(Dipole):
+def printDipole(path,Dipole):
    """
       Print transition dipoles into Dipole.txt file
    """
-
+   outFile = path/"Dipole.txt"
    row_n = np.arange(0,Dipole.shape[0],dtype=np.int32)
    fmt = ["%.7f"]*Dipole.shape[1]
    fmt.insert(0,"%i")
-   np.savetxt("Dipole.txt",np.column_stack((row_n,Dipole)),fmt=fmt)
+   np.savetxt(outFile,np.column_stack((row_n,Dipole)),fmt=fmt)
    print(f" >>>>> Transition dipole moments have been saved to Dipole.txt file.")
 
-def printEnergy(Energy):
+def printEnergy(path,Energy):
    """
       Print upper triangle Hamiltonian into Energy.txt file
    """ 
+   outFile = path/"Energy.txt"
    n: int = Energy.shape[1]*(Energy.shape[1]+1)//2
    Energy_out = np.zeros((Energy.shape[0],n),dtype=np.float32)
 
@@ -30,7 +31,7 @@ def printEnergy(Energy):
    row_n = np.arange(0,Energy.shape[0],dtype=np.int32)
    fmt = ["%.7f"]*n 
    fmt.insert(0,"%i")
-   np.savetxt("Energy.txt",np.column_stack((row_n,Energy_out)),fmt=fmt)
+   np.savetxt(outFile,np.column_stack((row_n,Energy_out)),fmt=fmt)
    print(f" >>>>> Hamiltonian has been saved to Energy.txt file.")
 
 def minImage(v, box):
