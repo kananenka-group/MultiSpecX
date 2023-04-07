@@ -2,6 +2,7 @@ import mdtraj as md
 import time
 import os
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from ..system import *
 from ..amideI import *
@@ -54,6 +55,11 @@ class Ester:
      charges = np.asarray([ x[6] for x in self.atoms ],dtype=np.float32)
      masses  = np.asarray([ x[7] for x in self.atoms ],dtype=np.float32)
 
+     # create directory
+     path = Path(self.outDir)
+     path.mkdir(parents=True, exist_ok=True)
+     print(f" >>>>> Output files will be written into {self.outDir} directory.")
+
      # loop over all frames
      t = md.load(self.xtc, top=self.gro)
      nframes = t.xyz.shape[0]
@@ -68,6 +74,7 @@ class Ester:
      print(f"       Total number of frames to read: {self.nframes}")
 
      for frame in range(self.nframes):
+
         xyz_raw = 10.0*t.xyz[frame,:,:]                #units=A
         box     = 10.0*t.unitcell_lengths[frame,:]     #units=A
 
@@ -110,8 +117,8 @@ class Ester:
               Energy[frame,i1,i2] = Energy[frame,i2,i1] = TDC(tdv_f[i1], tdv_f[i2], tdp_f[i1], tdp_f[i2], box)
     
      # print Hamiltonian into file
-     printEnergy(Energy) 
-     printDipole(Dipole)
+     printEnergy(path,Energy) 
+     printDipole(path,Dipole)
      
      # finish here
      end_time = time.time()
