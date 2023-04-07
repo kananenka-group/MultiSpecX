@@ -51,7 +51,7 @@ def TDC(tdv_i, tdv_j, tdp_i, tdp_j, box) -> float:
       tdp_i and tdp_j - location of dipoles in A    
       box             - box dimensions in A
   
-      Use scaling factor 84861.9/1650.0 
+      Use scaling factor 84861.9/1650.0 which converts to cm-1
          from: J. Phys. Chem. B 2006, 110, 3362-3374 
           and  J. Phys. Chem. B 2011, 115, 3713–3724
  
@@ -67,21 +67,39 @@ def TDC(tdv_i, tdv_j, tdp_i, tdp_j, box) -> float:
 def calcEf(atoms: List[int], projections, xyz, xyz_ref, charges):
    """
       Caclulate electric fields on atoms and 
-      optionally projections on selected vectors
+      projections on selected bonds.
+
+      Input
+      -----
+
+      atoms       - List of atoms for which electric field is to be calculated
+      projections - List of pairs of atoms connected by a bond to project electric field on
+      xyz         - Cartesian coordinates of all atoms in the environemnt, in A
+      xyz_ref     - Cartesian coordinates of the reference group of atoms, in A
+      charges     - Atomic charges in a.u.
    """
-   assert xyz.shape[0] == len(charges), f" something is wrong in calcEf {xyz_ref.shape[0]} vs {len(charges)}"
+   if xyz.shape[0] != len(charges):
+      raise ValueError(f" Wrong dimensions in calcEf xyz shape {xyz_ref.shape[0]} vs charges shape {len(charges)}")
 
    eF = np.zeros((len(atoms),3),dtype=np.float32)
 
+   #for atom in atoms:
+   #   eFa = np.zeros((3))
+   #   for ai in range(xyz.shape[0]):
+   #      vij = ATOAU*(xyz[ai,:] - xyz_ref[atom,:])  #units=a.u. because map requires this
+   #      dij = np.linalg.norm(vij)
+   #      dij3 = dij**3
+   #      eFa += vij*charges[ai]/dij3
+   #      #print (" atom ",vij*charges[ai]/dij3)
+   #   eF[atom,:] = np.copy(eFa) 
+   
    for atom in atoms:
-      eFa = np.zeros((3))
-      for ai in range(xyz.shape[0]):
-         vij = ATOAU*(xyz[ai,:] - xyz_ref[atom,:])  #units=a.u. because map requires this
-         dij = np.linalg.norm(vij)
-         dij3 = dij**3
-         eFa += vij*charges[ai]/dij3
-      eF[atom,:] = np.copy(eFa) 
-   # make it 1D for the electric field
+      #units=a.u. because map requires this
+      vij = np.array([ ATOAU*(xyz[x,:] - xyz_ref[atom,:]) for x in range(xyz.shape[0]) ])
+      qvij= np.array([ charges[x]*vij[x,:] for x in range(vij.shape[0]) ])  
+      dij = np.array([ np.linalg.norm(vij[x,:]) for x in range(vij.shape[0]) ])
+      dij3 = dij**3
+      eF[atom,:] = np.sum(np.array([ np.divide(qvij[x,:],dij3[x]) for x in range(qvij.shape[0])]),axis=0)
 
    # projections:
    eFp = np.zeros((len(projections)),dtype=np.float32)

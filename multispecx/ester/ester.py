@@ -27,7 +27,7 @@ class Ester:
      start_time = time.time()
      printDT("starts")
 
-     emap_cut = 21.0  # units=A
+     emap_cut = 21.0  # units=Angstrom
 
      # create a system object
      s = System(self.itp,self.top,self.gro)
@@ -75,8 +75,8 @@ class Ester:
 
      for frame in range(self.nframes):
 
-        xyz_raw = 10.0*t.xyz[frame,:,:]                #units=A
-        box     = 10.0*t.unitcell_lengths[frame,:]     #units=A
+        xyz_raw = NMTOA*t.xyz[frame,:,:]                #units=A
+        box     = NMTOA*t.unitcell_lengths[frame,:]     #units=A
 
         tdv_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
         tdp_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
@@ -127,8 +127,9 @@ class Ester:
 
    def ester_TDC_Wang20(self, xyz, box):
       """
-         Here we will use TD for the ester developed by Lu Wang in J. Chem. Phys. 153, 035101 (2020)
-         see also Wei Zhuang paper
+         Here we will use TD for the ester developed by Lu Wang in 
+         J. Chem. Phys. 153, 035101 (2020)
+         
       """
       tdAngle: float = 15.1*np.pi/180.0
       tdMag: float   = 2.10   # units are D*A^{-1}*u^{-1/2}, u is a.m.u.
