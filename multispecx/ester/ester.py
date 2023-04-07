@@ -29,12 +29,10 @@ class Ester:
 
          Input:
          ------
-
          system information (gro, top, xtc files)
 
          Output:
          -------
-
          number of frames in MD trajectory
       """
       start_time = time.time()
