@@ -24,6 +24,19 @@ class Ester:
    freq_shift: float = 0.0
 
    def checkTrajectory(self):
+      """
+         Perform some checks here.
+
+         Input:
+         ------
+
+         system information (gro, top, xtc files)
+
+         Output:
+         -------
+
+         number of frames in MD trajectory
+      """
       start_time = time.time()
       printDT("starts")
       print(f" >>>>> Checking system and MD xtc trajectory.")
