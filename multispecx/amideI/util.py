@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+import warnings
 
 from datetime import datetime
 from typing import List
@@ -155,23 +156,40 @@ def rotation_matrix(va, vb):
    return Rot
 
 def CartDir(inp: str):
+   """
+      Return unit vector in specified direction.
+
+      Input:
+      ------
+      str - "x", "y", or "z"
+   
+   """
    match inp:
-      case "x":
+      case 'x':
          return np.array([1.0,0.0,0.0],dtype=np.float32)
-      case "y":
+      case 'y':
          return np.array([0.0,1.0,0.0],dtype=np.float32)
-      case "z":
+      case 'z':
          return np.array([0.0,0.0,1.0],dtype=np.float32)
       case _:
          raise ValueError (f" Cannot recognize the rotation axis {inp} can only be 'x', 'y', or 'z'") 
 
 def transformXYZ(transform, solu_xyz, solv_xyz):
    """
-      Here input coordinates for the solute and solvent will be
-      transformed
+      Transform solute and solvent coordinates according to
+      given transformations
 
-      throw in a warning message when coordiates are distorted by 
-      1% (distance change w.r.t. reference atom)
+      Input:
+      ------
+      transform - nested list of all required transformations (shifts and rotations)
+      solu_xyz  - Cartesian coordinates of the solute molecule, in A
+      solv_xyz  - Cartesian coordinates of the solvent molecules, in A 
+
+      Notes:
+      ------
+      Check the distance between each solute/solvent atom and the reference solute
+      atom and throw in a warning when coordiates are changes by more than thresh
+      (currently set to 1.0%)
    """
    thresh: float = 0.01
    solu_xyz_t = np.copy(solu_xyz)
@@ -186,22 +204,13 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
             solu_xyz_t[n,:] = np.subtract(solu_xyz_t[n,:],xyz_shift)
          for n in range(solv_xyz_t.shape[0]):
             solv_xyz_t[n,:] = np.subtract(solv_xyz_t[n,:],xyz_shift)
+
       # align w.r.t particular axis
       elif item[0].lower() == "rotate":
          atomn = item[1]-1
          atomp = item[2]-1
          va = np.subtract(solu_xyz_t[atomp,:],solu_xyz_t[atomn,:])
          vb = CartDir(item[3].lower())
-
-         #if item[3].lower() == "z":
-         #   vb = np.array([0.0,0.0,1.0],dtype=np.float32)
-         #elif item[3].lower() == "y":
-         #   vb = np.array([0.0,1.0,0.0],dtype=np.float32)
-         #elif item[3].lower() == "x":
-         #   vb = np.array([1.0,0.0,0.0],dtype=np.float32)
-         #else:
-         #   sys.exit(f" Cannot recognize the rotation axis {item[3]} can only be 'x', 'y', or 'z'") 
-
          Rot = rotation_matrix(va,vb) 
          # rotate all atoms here ...
          for n in range(solu_xyz_t.shape[0]):
@@ -209,7 +218,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          for n in range(solv_xyz_t.shape[0]):
             solv_xyz_t[n,:] = Rot.dot(solv_xyz_t[n,:])
       else:
-         sys.exit(" Cannot recognize this transformation operation {item}")
+         raise ValueError(f" Cannot recognize this transformation operation {item}")
 
    # check the distance w.r.t ref atom before and after transformaton:
    for n in range(solu_xyz.shape[0]):
@@ -220,7 +229,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solu_xyz[n,:])
          print(" After = ",solu_xyz_t[n,:])
-         print(f" Error (w.r.t. solute reference atom {atom_center}) = {100*sv_er} %.")
+         warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {100*sv_er} %.")
 
    for n in range(solv_xyz.shape[0]):
       bf = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solv_xyz[n,:]))
@@ -230,7 +239,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solv_xyz[n,:])
          print(" After = ",solv_xyz_t[n,:])
-         print(f" Error (w.r.t. solute reference atom {atom_center}) = {100*sv_er} %.")
+         warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {100*sv_er} %.")
 
    return solu_xyz_t, solv_xyz_t
 
