@@ -23,6 +23,25 @@ class Ester:
    elFmap: str  = "Baiz2016"
    freq_shift: float = 0.0
 
+   def checkTrajectory(self):
+      start_time = time.time()
+      printDT("starts")
+      print(f" >>>>> Checking system and MD xtc trajectory.")
+
+      s = System(self.itp,self.top,self.gro)
+      self.atoms, self.molecules, self.atoms_in_mol, _, _ = s.read()
+
+      t = md.load(self.xtc, top=self.gro)
+      nframes = t.xyz.shape[0]
+      print(f" >>>>> Reading frames from {self.xtc} file")
+      print(f"       Total number of frames to read: {nframes}")
+
+      end_time = time.time()
+      print(f" >>>>> Execution time: {(end_time - start_time)/60:.1f} minutes")
+      printDT("ends")
+      return nframes
+
+
    def generateHamiltonian(self): 
      start_time = time.time()
      printDT("starts")
