@@ -1,8 +1,9 @@
 import mdtraj as md
 import time
-from ..system import *
+import os
 from dataclasses import dataclass, field
 
+from ..system import *
 from ..amideI import *
 
 @dataclass
@@ -14,6 +15,7 @@ class Ester:
    gro:  str = "confout.gro"
    xtc:  str = "traj.xtc" 
    top:  str = "topology.top"
+   outDir: str = os.getcwd()
    isotope_labels: list = field(default_factory=lambda: [])
    transform: list = field(default_factory=lambda: [])
    start: int = 1
@@ -24,7 +26,7 @@ class Ester:
      start_time = time.time()
      printDT("starts")
 
-     emap_cut = 21.0 #this is in A *ATOAU
+     emap_cut = 21.0  # units=A
 
      # create a system object
      s = System(self.itp,self.top,self.gro)
@@ -41,7 +43,6 @@ class Ester:
 
      # determine where charge groups start
      cgS = chargeGroupSt(self.atoms)
-     #cgS = np.append(cgO,[len(self.atoms)])
 
      # build coordiate transformation here
      self.transform_internal = getInternalTransformXYZ(self.transform, self.ester_unit, chrom_idx)
@@ -67,8 +68,8 @@ class Ester:
      print(f"       Total number of frames to read: {self.nframes}")
 
      for frame in range(self.nframes):
-        xyz_raw = 10.0*t.xyz[frame,:,:]  #NMTOAU*t.xyz[frame,:,:]
-        box     = 10.0*t.unitcell_lengths[frame,:] #NMTOAU*t.unitcell_lengths[frame,:]
+        xyz_raw = 10.0*t.xyz[frame,:,:]                #units=A
+        box     = 10.0*t.unitcell_lengths[frame,:]     #units=A
 
         tdv_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
         tdp_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
@@ -106,7 +107,7 @@ class Ester:
         # calculate TDC:
         for i1 in range(len(chrom_idx)):
            for i2 in range(i1):
-              Energy[frame,i1,i2] = Energy[frame,i2,i1] = TDC(tdv_f[i1], tdv_f[i2], tdp_f[i1], tdp_f[i2], tdMag, box)
+              Energy[frame,i1,i2] = Energy[frame,i2,i1] = TDC(tdv_f[i1], tdv_f[i2], tdp_f[i1], tdp_f[i2], box)
     
      # print Hamiltonian into file
      printEnergy(Energy) 
@@ -142,7 +143,7 @@ class Ester:
       tdv *= tdMag
 
       # td position is midway CO bond, see Lu Wang paper
-      tdp = xyz[0,:] + 0.5*vcod*vC
+      tdp = xyz[0,:] + 0.5*vcod*vC   
  
       return tdv, tdp, tdMag
 

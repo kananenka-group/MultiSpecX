@@ -39,13 +39,24 @@ def minImage(v, box):
 def printDT(pt):
    print(f" >>>>> Simulation {pt}: {datetime.today():%B %d, %Y %H:%M:%S}") 
 
-def TDC(tdv_i, tdv_j, tdp_i, tdp_j, tdMag, box) -> float:
+def TDC(tdv_i, tdv_j, tdp_i, tdp_j, box) -> float:
    """
       Calculate transition dipole coupling in cm-1
+
+      Input:
+      ------
+ 
+      tdv_i and tdv_j - transition dipole moments in D*A^{-1}*a.m.u.^{-1/2}
+      tdp_i and tdp_j - location of dipoles in A    
+      box             - box dimensions in A
+  
+      Use scaling factor 84861.9/1650.0 
+         from: J. Phys. Chem. B 2006, 110, 3362-3374 
+          and  J. Phys. Chem. B 2011, 115, 3713–3724
  
    """
-   scale: float = 84861.9/1650 #383.313*NMTOAU*NMTOAU*NMTOAU/(1000*tdMag*tdMag)
-   rij = minImage(tdp_j - tdp_i,box)
+   scale: float = 84861.9/1650.0  
+   rij = minImage(np.subtract(tdp_j,tdp_i),box)
    dij = 1.0/np.linalg.norm(rij)
    dij3 = dij**3
    dij5 = dij3*dij*dij
@@ -64,9 +75,8 @@ def calcEf(atoms: List[int], projections, xyz, xyz_ref, charges):
    for atom in atoms:
       eFa = np.zeros((3))
       for ai in range(xyz.shape[0]):
-         vij = xyz[ai,:] - xyz_ref[atom,:]
+         vij = ATOAU*(xyz[ai,:] - xyz_ref[atom,:])  #units=a.u. because map requires this
          dij = np.linalg.norm(vij)
-         dij *= ATOAU
          dij3 = dij**3
          eFa += vij*charges[ai]/dij3
       eF[atom,:] = np.copy(eFa) 
@@ -230,6 +240,7 @@ def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS):
          atoms = list(range(cgS[n],cgS[n+1]))
          atoms_include.extend(atoms)
    [ atoms_include.remove(atr) for atr in atoms_exclude ]
+
    return np.asarray(atoms_include,dtype=np.int32)
 
 def getCOMChg(xyz, cgS, masses):
