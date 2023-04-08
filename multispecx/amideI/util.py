@@ -245,18 +245,18 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
 
    return solu_xyz_t, solv_xyz_t
 
-   def print_transform_info(self):
-      """
-         Just print transformation operations to be applied
-      """ 
-      if self.transform:
-         print(f">>>>> Coordinate transformation:")
+def print_transform_info(self):
+   """
+      Just print transformation operations to be applied
+   """ 
+   if self.transform:
+      print(f">>>>> Coordinate transformation:")
 
-      for item in self.transform:
-         if item[0].lower() == "center":
-            print(f"      The frames will be translated to put atom {self.solute[3][item[1]-1]}({item[1]}) at the center of the box.")
-         if item[0].lower() == "rotate":
-            print(f"      The frames will be rotated such that vector {self.solute[3][item[1]-1]}({item[1]}) -> {self.solute[3][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
+   for item in self.transform:
+      if item[0].lower() == "center":
+         print(f"      The frames will be translated to put atom {self.solute[3][item[1]-1]}({item[1]}) at the center of the box.")
+      if item[0].lower() == "rotate":
+         print(f"      The frames will be rotated such that vector {self.solute[3][item[1]-1]}({item[1]}) -> {self.solute[3][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
 
 def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS):
    """
