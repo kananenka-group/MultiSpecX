@@ -49,7 +49,6 @@ def TDC(tdv_i, tdv_j, tdp_i, tdp_j, box) -> float:
 
       Input:
       ------
- 
       tdv_i and tdv_j - transition dipole moments in D*A^{-1}*a.m.u.^{-1/2}
       tdp_i and tdp_j - location of dipoles in A    
       box             - box dimensions in A
@@ -74,7 +73,6 @@ def calcEf(atoms: List[int], projections, xyz, xyz_ref, charges):
 
       Input
       -----
-
       atoms       - List of atoms for which electric field is to be calculated
       projections - List of pairs of atoms connected by a bond to project electric field on
       xyz         - Cartesian coordinates of all atoms in the environemnt, in A
@@ -301,6 +299,8 @@ def centerBox(xyz, ref, box):
    shift = np.subtract(ref,box/2.0)
    for n in range(xyzc.shape[0]):
       xyzc[n,:] = inBox(np.subtract(xyzc[n,:],shift),box)
+
+   #xyzc = np.array([ inBox((xyzc[n,:]-shift),box) for n in range(xyzc.shape[0]) ])
 
    return xyzc
 
