@@ -54,106 +54,110 @@ class Ester:
 
 
    def generateHamiltonian(self): 
-     start_time = time.time()
-     printDT("starts")
+      start_time = time.time()
+      printDT("starts")
 
-     emap_cut = 21.0  # units=Angstrom
+      emap_cut = 21.0  # units=Angstrom
 
-     # create a system object
-     s = System(self.itp,self.top,self.gro)
-     self.atoms, self.molecules, self.atoms_in_mol, _, _ = s.read()
+      # create a system object
+      s = System(self.itp,self.top,self.gro)
+      self.atoms, self.molecules, self.atoms_in_mol, _, _ = s.read()
 
-     # find indices of ester groups in each molecule
-     chrom_idx, ester_list_idx, n_ester_mol = chromList(self.isotope_labels, self.ester_unit, self.atoms, self.atoms_in_mol)
-     if not chrom_idx:
+      # find indices of ester groups in each molecule
+      chrom_idx, ester_list_idx, n_ester_mol = chromList(self.isotope_labels, self.ester_unit, self.atoms, self.atoms_in_mol)
+      if not chrom_idx:
         print(f" Did not find any ester groups like this: {self.ester_unit}")
         sys.exit(" exiting...")
-     else:
+      else:
         print(f"       Found {len(chrom_idx)} ester chromophores: ")
         [print (f"       {id} in {molid[0]} ") for (id,molid) in zip(n_ester_mol,self.molecules) if id>0]
 
-     # determine where charge groups start
-     cgS = chargeGroupSt(self.atoms)
+      # determine where charge groups start
+      cgS = chargeGroupSt(self.atoms)
 
-     # build coordiate transformation here
-     self.transform_internal = getInternalTransformXYZ(self.transform, self.ester_unit, chrom_idx)
+      # build coordiate transformation here
+      self.transform_internal = getInternalTransformXYZ(self.transform, self.ester_unit, chrom_idx)
 
-     # figure out how to use map:
-     map_w0, Elst_map, ef_atoms, ef_proj = self.getMap()
+      # figure out how to use map:
+      map_w0, Elst_map, ef_atoms, ef_proj = self.getMap()
 
-     # prepare some variables for fast processing
-     charges = np.asarray([ x[6] for x in self.atoms ],dtype=np.float32)
-     masses  = np.asarray([ x[7] for x in self.atoms ],dtype=np.float32)
+      # prepare some variables for fast processing
+      charges = np.asarray([ x[6] for x in self.atoms ],dtype=np.float32)
+      masses  = np.asarray([ x[7] for x in self.atoms ],dtype=np.float32)
 
-     # create directory
-     path = Path(self.outDir)
-     path.mkdir(parents=True, exist_ok=True)
-     print(f" >>>>> Output files will be written into {self.outDir} directory.")
+      # create directory
+      path = Path(self.outDir)
+      path.mkdir(parents=True, exist_ok=True)
+      print(f" >>>>> Output files will be written into {self.outDir} directory.")
 
-     # loop over all frames
-     t = md.load(self.xtc, top=self.gro)
-     nframes = t.xyz.shape[0]
+      # loop over all frames
+      t = md.load(self.xtc, top=self.gro)
+      nframes = t.xyz.shape[0]
+      # check all these below
+      #nframes = t.n_frames
+      #timestep = t.timestep # in ps
+      #n_atoms = t.n_atoms
 
-     if not self.nframes:
+      if not self.nframes:
         self.nframes = nframes
 
-     Energy = np.zeros((self.nframes,len(chrom_idx),len(chrom_idx)),dtype=np.float32)  
-     Dipole = np.zeros((self.nframes,len(chrom_idx)*3),dtype=np.float32)
+      Energy = np.zeros((self.nframes,len(chrom_idx),len(chrom_idx)),dtype=np.float32)  
+      Dipole = np.zeros((self.nframes,len(chrom_idx)*3),dtype=np.float32)
 
-     print(f" >>>>> Reading frames from {self.xtc} file") 
-     print(f"       Total number of frames to read: {self.nframes}")
+      print(f" >>>>> Reading frames from {self.xtc} file") 
+      print(f"       Total number of frames to read: {self.nframes}")
 
-     for frame in range(self.nframes):
+      for frame in range(self.nframes):
 
-        xyz_raw = NMTOA*t.xyz[frame,:,:]                #units=A
-        box     = NMTOA*t.unitcell_lengths[frame,:]     #units=A
+         xyz_raw = NMTOA*t.xyz[frame,:,:]                #units=A
+         box     = NMTOA*t.unitcell_lengths[frame,:]     #units=A
 
-        tdv_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
-        tdp_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
+         tdv_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
+         tdp_f  = np.zeros((len(chrom_idx),3),dtype=np.float32)
 
-        # loop over all chromphores
-        for chind, chrom in enumerate(chrom_idx):
+         # loop over all chromphores
+         for chind, chrom in enumerate(chrom_idx):
 
-           xyz_chrom_raw = xyz_raw[chrom,:]
+            xyz_chrom_raw = xyz_raw[chrom,:]
 
-           # calculate transition dipole moments before we do anything with the box
-           tdv_f[chind,:], tdp_f[chind,:], tdMag = self.ester_TDC_Wang20(xyz_chrom_raw, box)
-           Dipole[frame,3*chind:3*chind+3] = np.copy(tdv_f[chind,:])
+            # calculate transition dipole moments before we do anything with the box
+            tdv_f[chind,:], tdp_f[chind,:], tdMag = self.ester_TDC_Wang20(xyz_chrom_raw, box)
+            Dipole[frame,3*chind:3*chind+3] = np.copy(tdv_f[chind,:])
 
-           # re-center box at the COM of selected atoms
-           com_raw = getCOM(xyz_chrom_raw, masses[chrom])
-           xyz = centerBox(xyz_raw, com_raw, box)
-           xyz_chrom = xyz[chrom,:]
-           com = getCOM(xyz_chrom, masses[chrom])
+            # re-center box at the COM of selected atoms
+            com_raw = getCOM(xyz_chrom_raw, masses[chrom])
+            xyz = centerBox(xyz_raw, com_raw, box)
+            xyz_chrom = xyz[chrom,:]
+            com = getCOM(xyz_chrom, masses[chrom])
 
-           # determine COM for all charge groups
-           comCg = getCOMChg(xyz, cgS, masses)
+            # determine COM for all charge groups
+            comCg = getCOMChg(xyz, cgS, masses)
 
-           # save atoms that contribute to efield of this chromophore 
-           atoms_include = AinF(comCg, chrom, com, emap_cut, cgS)
+            # save atoms that contribute to efield of this chromophore 
+            atoms_include = AinF(comCg, chrom, com, emap_cut, cgS)
            
-           # coordinate transformation for all included_atoms and ester unit
-           ester_t, envr_t = transformXYZ(self.transform_internal[chind], xyz_chrom, xyz[atoms_include,:])
+            # coordinate transformation for all included_atoms and ester unit
+            ester_t, envr_t = transformXYZ(self.transform_internal[chind], xyz_chrom, xyz[atoms_include,:])
 
-           # calculate electric field components at selected atoms
-           efc, efp = calcEf(ef_atoms, ef_proj, envr_t, ester_t, charges[atoms_include])
+            # calculate electric field components at selected atoms
+            efc, efp = calcEf(ef_atoms, ef_proj, envr_t, ester_t, charges[atoms_include])
            
-           # map goes here
-           Energy[frame,chind,chind] = map_w0 + self.freq_shift + np.dot(Elst_map, efc)
+            # map goes here
+            Energy[frame,chind,chind] = map_w0 + self.freq_shift + np.dot(Elst_map, efc)
           
-        # calculate TDC:
-        for i1 in range(len(chrom_idx)):
-           for i2 in range(i1):
-              Energy[frame,i1,i2] = Energy[frame,i2,i1] = TDC(tdv_f[i1], tdv_f[i2], tdp_f[i1], tdp_f[i2], box)
+         # calculate TDC:
+         for i1 in range(len(chrom_idx)):
+            for i2 in range(i1):
+               Energy[frame,i1,i2] = Energy[frame,i2,i1] = TDC(tdv_f[i1], tdv_f[i2], tdp_f[i1], tdp_f[i2], box)
     
-     # print Hamiltonian into file
-     printEnergy(path,Energy) 
-     printDipole(path,Dipole)
+      # print Hamiltonian and TD into file
+      printEnergy(path,Energy) 
+      printDipole(path,Dipole)
      
-     # finish here
-     end_time = time.time()
-     print(f" >>>>> Execution time: {(end_time - start_time)/60:.1f} minutes")
-     printDT("ends")
+      # finish here
+      end_time = time.time()
+      print(f" >>>>> Execution time: {(end_time - start_time)/60:.1f} minutes")
+      printDT("ends")
 
    def ester_TDC_Wang20(self, xyz, box):
       """
