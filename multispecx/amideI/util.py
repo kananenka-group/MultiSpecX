@@ -152,6 +152,7 @@ def rotation_matrix(va, vb):
    fc: float 
    indl: int 
 
+   # work on this below, make return statement for c=-1
    if c > -1.0:
       Vx = np.array([[    0, -v[2],   v[1]],
                      [ v[2],     0,  -v[0]],
