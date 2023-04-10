@@ -82,30 +82,30 @@ class Ester:
       map_w0, Elst_map, ef_atoms, ef_proj = self.getMap()
 
       # prepare some variables for fast processing
-      charges = np.asarray([ x[6] for x in self.atoms ],dtype=np.float32)
-      masses  = np.asarray([ x[7] for x in self.atoms ],dtype=np.float32)
+      charges = np.array([ x[6] for x in self.atoms ],dtype=np.float32)
+      masses  = np.array([ x[7] for x in self.atoms ],dtype=np.float32)
 
       # create directory
       path = Path(self.outDir)
       path.mkdir(parents=True, exist_ok=True)
-      print(f" >>>>> Output files will be written into {self.outDir} directory.")
+      print(f" >>>>> Output files will be written into {path.absolute()} directory.")
 
       # loop over all frames
       t = md.load(self.xtc, top=self.gro)
-      nframes = t.xyz.shape[0]
-      # check all these below
-      #nframes = t.n_frames
-      #timestep = t.timestep # in ps
-      #n_atoms = t.n_atoms
+      nframes = t.n_frames
 
       if not self.nframes:
         self.nframes = nframes
+
+      if t.n_atoms != len(self.atoms):
+         raise ValueError(f" Number of atoms in xtc file {t.n_atoms} does not match number of atoms in config. files {len(self.atoms)}")
 
       Energy = np.zeros((self.nframes,len(chrom_idx),len(chrom_idx)),dtype=np.float32)  
       Dipole = np.zeros((self.nframes,len(chrom_idx)*3),dtype=np.float32)
 
       print(f" >>>>> Reading frames from {self.xtc} file") 
       print(f"       Total number of frames to read: {self.nframes}")
+      print(f"       Timestep: {t.timestep:.3f} [ps]")
 
       for frame in range(self.nframes):
 
@@ -121,7 +121,7 @@ class Ester:
             xyz_chrom_raw = xyz_raw[chrom,:]
 
             # calculate transition dipole moments before we do anything with the box
-            tdv_f[chind,:], tdp_f[chind,:], tdMag = self.ester_TDC_Wang20(xyz_chrom_raw, box)
+            tdv_f[chind,:], tdp_f[chind,:] = self.ester_TDC_Wang20(xyz_chrom_raw, box)
             Dipole[frame,3*chind:3*chind+3] = np.copy(tdv_f[chind,:])
 
             # re-center box at the COM of selected atoms
@@ -134,7 +134,10 @@ class Ester:
             comCg = getCOMChg(xyz, cgS, masses)
 
             # save atoms that contribute to efield of this chromophore 
-            atoms_include = AinF(comCg, chrom, com, emap_cut, cgS)
+            cg_atoms_include = include_CG_atoms(comCg, com, emap_cut, cgS)
+            # remove atoms that belong to the chromophore
+            atoms_include = exclude_chrom_atoms(cg_atoms_include, chrom)
+            # remove other atoms here?
            
             # coordinate transformation for all included_atoms and ester unit
             ester_t, envr_t = transformXYZ(self.transform_internal[chind], xyz_chrom, xyz[atoms_include,:])
@@ -187,7 +190,7 @@ class Ester:
       # td position is midway CO bond, see Lu Wang paper
       tdp = xyz[0,:] + 0.5*vcod*vC   
  
-      return tdv, tdp, tdMag
+      return tdv, tdp
 
    def getMap(self):
       """
