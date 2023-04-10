@@ -23,7 +23,7 @@ class Ester:
    elFmap: str  = "Baiz2016"
    freq_shift: float = 0.0
 
-   def checkTrajectory(self):
+   def checkTrajectory(self) -> int:
       """
          Perform some checks here.
 
@@ -53,7 +53,7 @@ class Ester:
       return nframes
 
 
-   def generateHamiltonian(self): 
+   def generateHamiltonian(self) -> None: 
       start_time = time.time()
       printDT("starts")
 
