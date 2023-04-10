@@ -139,8 +139,12 @@ def rotation_matrix(va, vb):
    v = np.cross(uva, uvb)
 
    norm_v = np.linalg.norm(v)
-   if np.abs(norm_v) < 1.0e-6:
-      raise ValueError (f' Norm of uva x uvb is small. Vectors are parallel? {uva} and {uvb}')
+   if np.abs(norm_v) < 1.0e-7:
+      # two vectors are parallel, no rotation is needed
+      warnings.warn(f" Norm of uva x uvb is small. Vectors are parallel? {uva} and {uvb}. No rotation needed.")
+      Rot = np.eye(3)
+      return Rot
+      
    
    s = v/norm_v
    c = np.dot(uva,uvb)
