@@ -9,7 +9,7 @@ from typing import List
 
 from .constants import *
 
-def printDipole(path,Dipole):
+def printDipole(path,Dipole) -> None:
    """
       Print transition dipoles into Dipole.txt file
    """
@@ -20,7 +20,7 @@ def printDipole(path,Dipole):
    np.savetxt(outFile,np.column_stack((row_n,Dipole)),fmt=fmt)
    print(f" >>>>> Transition dipole moments have been saved to Dipole.txt file.")
 
-def printEnergy(path,Energy):
+def printEnergy(path,Energy) -> None:
    """
       Print upper triangle Hamiltonian into Energy.txt file
    """ 
@@ -80,7 +80,8 @@ def calcEf(atoms: List[int], projections, xyz, xyz_ref, charges):
       charges     - Atomic charges in a.u.
    """
    if xyz.shape[0] != len(charges):
-      raise ValueError(f" Wrong dimensions in calcEf xyz shape {xyz_ref.shape[0]} vs charges shape {len(charges)}")
+      raise ValueError(f""" Wrong dimensions in calcEf xyz shape {xyz_ref.shape[0]} vs 
+                            charges shape {len(charges)}""")
 
    eF = np.zeros((len(atoms),3),dtype=np.float32)
 
@@ -134,8 +135,14 @@ def rotation_matrix(va, vb):
    uva = va/np.linalg.norm(va)
    uvb = vb/np.linalg.norm(vb)
 
+   # check conditions when v below can become zero
    v = np.cross(uva, uvb)
-   s = v/np.linalg.norm(v)
+
+   norm_v = np.linalg.norm(v)
+   if np.abs(norm_v) < 1.0e-6:
+      raise ValueError (f' Norm of uva x uvb is small. Vectors are parallel? {uva} and {uvb}')
+   
+   s = v/norm_v
    c = np.dot(uva,uvb)
 
    fc: float 
@@ -229,7 +236,8 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solu_xyz[n,:])
          print(" After = ",solu_xyz_t[n,:])
-         warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {(100*su_er):.2f} %.")
+         su_er*=100
+         warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {su_er:.2f} %.")
 
    for n in range(solv_xyz.shape[0]):
       bf = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solv_xyz[n,:]))
@@ -239,7 +247,8 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solv_xyz[n,:])
          print(" After = ",solv_xyz_t[n,:])
-         warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {(100*sv_er):.2f} %.")
+         sv_er*=100
+         warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {sv_er:.2f} %.")
 
    return solu_xyz_t, solv_xyz_t
 
@@ -256,7 +265,7 @@ def print_transform_info(self):
       if item[0].lower() == "rotate":
          print(f"      The frames will be rotated such that vector {self.solute[3][item[1]-1]}({item[1]}) -> {self.solute[3][item[2]-1]}({item[2]}) will be aligned with the positive {item[3]} axis")
 
-def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS):
+def include_CG_atoms(xyz, xyz_ref, cut, cgS):
    """
       Make a list of atoms that are close enough to be
       included into electric field calculation
@@ -265,12 +274,18 @@ def AinF(xyz, atoms_exclude, xyz_ref, cut, cgS):
 
    for n in range(xyz.shape[0]):
       if np.linalg.norm(xyz[n,:]-xyz_ref) < cut:
+         # range below is iterator use it like the one to get atoms...
          atoms = list(range(cgS[n],cgS[n+1]))
          atoms_include.extend(atoms)
-   [ atoms_include.remove(atr) for atr in atoms_exclude ]
+   
+   return list(atoms_include)
 
-   return np.asarray(atoms_include,dtype=np.int32)
-
+def exclude_chrom_atoms(atoms, atoms_exclude) -> List[int]:
+   """
+      Exclude atoms of the chromophore from atoms list
+   """
+   return list(filter(lambda x: x not in atoms_exclude, atoms))
+   
 def getCOMChg(xyz, cgS, masses):
    """
       Returns center of masses of all charge groups
