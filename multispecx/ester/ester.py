@@ -20,7 +20,7 @@ class Ester:
    isotope_labels: list = field(default_factory=lambda: [])
    transform: list = field(default_factory=lambda: [])
    start: int = 1
-   elFmap: str  = "Baiz2016"
+   elFmap: str  = "Edington2016"
    freq_shift: float = 0.0
 
    def checkTrajectory(self) -> int:
@@ -81,7 +81,7 @@ class Ester:
       # figure out how to use map:
       map_w0, Elst_map, ef_atoms, ef_proj = self.getMap()
 
-      # prepare some variables for fast processing
+      # prepare some variables 
       charges = np.array([ x[6] for x in self.atoms ],dtype=np.float32)
       masses  = np.array([ x[7] for x in self.atoms ],dtype=np.float32)
 
@@ -201,7 +201,8 @@ class Ester:
       ef_projection = []   
       Elst_map = []
 
-      if self.elFmap == "Baiz2016":
+      if self.elFmap == "Edington2016":
+         print(f' >>>>> Ester frequency map from Edington et al., J. Phys. Chem. A 2016, 10, 3888-3896 will be used.')
          map_w0 = 1745.0
          Elst_map = [1967.6, -640.4, -835.4, 1154.6, -1964.2, 0.0, 0.0, -2776.0, 0.0]
          ef_atoms = [0, 1, 2]
