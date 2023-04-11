@@ -202,7 +202,7 @@ class Ester:
       Elst_map = []
 
       if self.elFmap == "Edington2016":
-         print(f' >>>>> C=O frequency map from Edington et al., J. Phys. Chem. A 2016, 10, 3888-3896 will be used.')
+         print(f' >>>>> Ester frequency map from Edington et al., J. Phys. Chem. A 2016, 10, 3888-3896 will be used.')
          map_w0 = 1745.0
          Elst_map = [1967.6, -640.4, -835.4, 1154.6, -1964.2, 0.0, 0.0, -2776.0, 0.0]
          ef_atoms = [0, 1, 2]
