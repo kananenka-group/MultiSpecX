@@ -111,9 +111,13 @@ def calcEf(atoms: List[int], projections, xyz, xyz_ref, charges):
    return np.reshape(eF,(len(atoms*3))), eFp
 
 def rotFlip(uvb):
+   """
+      In some cases rotation needed is 180o flip
+      handle it here
+   """
    indl = np.where(uvb == 1.0)[0]
    Rot = np.eye(3,dtype=np.float32)
-   Rot[:,indl] *=-1
+   Rot[:,indl] *=-1.0
    return Rot
 
 def rotation_matrix(va, vb):
