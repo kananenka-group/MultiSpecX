@@ -22,6 +22,7 @@ class Ester:
    start: int = 1
    elFmap: str  = "Edington2016"
    freq_shift: float = 0.0
+   additional_exclude: list = field(default_factory=lambda: ['CA'])
 
    def checkTrajectory(self) -> int:
       """
@@ -64,7 +65,8 @@ class Ester:
       self.atoms, self.molecules, self.atoms_in_mol, _, _ = s.read()
 
       # find indices of ester groups in each molecule
-      chrom_idx, ester_list_idx, n_ester_mol = chromList(self.isotope_labels, self.ester_unit, self.atoms, self.atoms_in_mol)
+      chrom_idx, _, n_ester_mol = chromList(self.isotope_labels, self.ester_unit, self.atoms, self.atoms_in_mol)
+      add_exclude_num, add_exclude_nam = self.ester_exclude_list(self.atoms, chrom_idx)
       if not chrom_idx:
         print(f" Did not find any ester groups like this: {self.ester_unit}")
         sys.exit(" exiting...")
@@ -161,6 +163,22 @@ class Ester:
       end_time = time.time()
       print(f" >>>>> Execution time: {(end_time - start_time)/60:.1f} minutes")
       printDT("ends")
+
+   def ester_exclude_list(self, atoms, chrom_idx):
+      """
+         Additonally for the ester specifically we will exclude
+         C atom closest to the ester group from the C=O side
+      """
+      list_exclude_num = []
+      list_exclude_nam = []
+      for chrom_atom_id in chrom_idx:
+         thisC = chrom_atom_id[0]
+         # look up 3 atoms back if carbon is there it cannot be any farther
+         print (atoms[thisC-3:thisC])
+         list_exclude_num.append([ int(atom[0]) for atom in atoms[thisC-3:thisC] if atom[4] in self.additional_exclude ])
+         list_exclude_nam.append([ atom[4] for atom in atoms[thisC-3:thisC] if atom[4] in self.additional_exclude ]) 
+      return list_exclude_num, list_exclude_nam
+
 
    def ester_TDC_Wang20(self, xyz, box):
       """
