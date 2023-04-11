@@ -142,6 +142,9 @@ def rotation_matrix(va, vb):
       uva and uvb pointing in exactly opposite direction. This special
       case is addressed below too
    """
+   fc: float 
+   indl: int 
+
    uva = va/np.linalg.norm(va)
    uvb = vb/np.linalg.norm(vb)
 
@@ -150,32 +153,30 @@ def rotation_matrix(va, vb):
 
    norm_v = np.linalg.norm(v)
    if np.abs(norm_v) < 1.0e-7:
-      if norm_v > 0:
+      if norm_v > 0.0:
          # two vectors are parallel, no rotation is needed
-         warnings.warn(f" Norm of uva x uvb is small > 0. Vectors are parallel? {uva} and {uvb}. No rotation needed.")
+         warnings.warn(f" Norm of uva x uvb is small {norm_v}. Vectors are parallel? {uva} and {uvb}. No rotation needed.")
          Rot = np.eye(3,dtype=np.float32)
          return Rot
-      elif norm_v < 0:
+      else:
          # two vectors are antiparallel flip would be needed
-         warnings.warn(f" Norm of uva x uvb is small < 0. Vectors are antiparallel? {uva} and {uvb}. Flipping...")
+         warnings.warn(f" Norm of uva x uvb is small {norm_v}. Vectors are antiparallel? {uva} and {uvb}. Flipping...")
          return rotFlip(uvb)
-   
-   s = v/norm_v
-   c = np.dot(uva,uvb)
-
-   fc: float 
-   indl: int 
-
-   # work on this below, make return statement for c=-1
-   if c > -1.0:
-      Vx = np.array([[    0, -v[2],   v[1]],
-                     [ v[2],     0,  -v[0]],
-                     [-v[1],  v[0],     0]],dtype=np.float32)
-      Vx2 = Vx @ Vx
-      fc = 1.0/(1.0 + c)
-      Rot = np.eye(3,dtype=np.float32) + Vx + fc*Vx2
    else:
-      Rot = rotFlip(uvb)
+      s = v/norm_v
+      c = np.dot(uva,uvb)
+
+   
+      # work on this below, make return statement for c=-1
+      if c > -1.0:
+         Vx = np.array([[    0, -v[2],   v[1]],
+                        [ v[2],     0,  -v[0]],
+                        [-v[1],  v[0],     0]],dtype=np.float32)
+         Vx2 = Vx @ Vx
+         fc = 1.0/(1.0 + c)
+         Rot = np.eye(3,dtype=np.float32) + Vx + fc*Vx2
+      else:
+         Rot = rotFlip(uvb)
 
    return Rot
 
