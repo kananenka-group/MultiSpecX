@@ -142,9 +142,8 @@ def rotation_matrix(va, vb):
    if np.abs(norm_v) < 1.0e-7:
       # two vectors are parallel, no rotation is needed
       warnings.warn(f" Norm of uva x uvb is small. Vectors are parallel? {uva} and {uvb}. No rotation needed.")
-      Rot = np.eye(3)
+      Rot = np.eye(3,dtype=np.float32)
       return Rot
-      
    
    s = v/norm_v
    c = np.dot(uva,uvb)
@@ -162,7 +161,7 @@ def rotation_matrix(va, vb):
       Rot = np.eye(3,dtype=np.float32) + Vx + fc*Vx2
    else:
       indl = np.where(uvb == 1.0)[0]
-      Rot = np.eye(3)
+      Rot = np.eye(3,dtype=np.float32)
       Rot[:,indl] *=-1
 
    return Rot
@@ -238,7 +237,6 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
       af = np.linalg.norm(np.subtract(solu_xyz_t[atom_center,:],solu_xyz_t[n,:]))
       su_er = (bf-af)/bf if bf > 0.0 else 0.0
       if np.max(np.abs(su_er)) > thresh:
-         print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solu_xyz[n,:])
          print(" After = ",solu_xyz_t[n,:])
          su_er*=100
@@ -249,7 +247,6 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
       af = np.linalg.norm(np.subtract(solu_xyz_t[atom_center,:],solv_xyz_t[n,:]))
       sv_er = (bf-af)/bf if bf > 0.0 else 0.0
       if np.max(np.abs(sv_er)) > thresh:
-         print(f" Warning. Potential problem with coordinate transformation: ")
          print(" Before = ",solv_xyz[n,:])
          print(" After = ",solv_xyz_t[n,:])
          sv_er*=100
