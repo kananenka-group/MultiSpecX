@@ -136,11 +136,12 @@ class Ester:
             comCg = getCOMChg(xyz, cgS, masses)
 
             # save atoms that contribute to efield of this chromophore 
-            cg_atoms_include = include_CG_atoms(comCg, com, emap_cut, cgS)
+            atoms_include1 = include_CG_atoms(comCg, com, emap_cut, cgS)
             # remove atoms that belong to the chromophore
-            atoms_include = exclude_chrom_atoms(cg_atoms_include, chrom)
-            # remove other atoms here?
-           
+            atoms_include2 = exclude_atoms_from_list(atoms_include1, chrom)
+            # remove other atoms here
+            atoms_include = exclude_atoms_from_list(atoms_include2, add_exclude_num[chind])
+            
             # coordinate transformation for all included_atoms and ester unit
             ester_t, envr_t = transformXYZ(self.transform_internal[chind], xyz_chrom, xyz[atoms_include,:])
 
@@ -174,7 +175,6 @@ class Ester:
       for chrom_atom_id in chrom_idx:
          thisC = chrom_atom_id[0]
          # look up 3 atoms back if carbon is there it cannot be any farther
-         print (atoms[thisC-3:thisC])
          list_exclude_num.append([ int(atom[0]) for atom in atoms[thisC-3:thisC] if atom[4] in self.additional_exclude ])
          list_exclude_nam.append([ atom[4] for atom in atoms[thisC-3:thisC] if atom[4] in self.additional_exclude ]) 
       return list_exclude_num, list_exclude_nam
