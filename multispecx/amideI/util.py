@@ -110,6 +110,12 @@ def calcEf(atoms: List[int], projections, xyz, xyz_ref, charges):
 
    return np.reshape(eF,(len(atoms*3))), eFp
 
+def rotFlip(uvb):
+   indl = np.where(uvb == 1.0)[0]
+   Rot = np.eye(3,dtype=np.float32)
+   Rot[:,indl] *=-1
+   return Rot
+
 def rotation_matrix(va, vb):
    """
       Generate rotation matrix:
@@ -140,10 +146,15 @@ def rotation_matrix(va, vb):
 
    norm_v = np.linalg.norm(v)
    if np.abs(norm_v) < 1.0e-7:
-      # two vectors are parallel, no rotation is needed
-      warnings.warn(f" Norm of uva x uvb is small. Vectors are parallel? {uva} and {uvb}. No rotation needed.")
-      Rot = np.eye(3,dtype=np.float32)
-      return Rot
+      if norm_v > 0:
+         # two vectors are parallel, no rotation is needed
+         warnings.warn(f" Norm of uva x uvb is small > 0. Vectors are parallel? {uva} and {uvb}. No rotation needed.")
+         Rot = np.eye(3,dtype=np.float32)
+         return Rot
+      elif norm_v < 0:
+         # two vectors are antiparallel flip would be needed
+         warnings.warn(f" Norm of uva x uvb is small < 0. Vectors are antiparallel? {uva} and {uvb}. Flipping...")
+         return rotFlip(uvb)
    
    s = v/norm_v
    c = np.dot(uva,uvb)
@@ -160,9 +171,7 @@ def rotation_matrix(va, vb):
       fc = 1.0/(1.0 + c)
       Rot = np.eye(3,dtype=np.float32) + Vx + fc*Vx2
    else:
-      indl = np.where(uvb == 1.0)[0]
-      Rot = np.eye(3,dtype=np.float32)
-      Rot[:,indl] *=-1
+      Rot = rotFlip(uvb)
 
    return Rot
 
