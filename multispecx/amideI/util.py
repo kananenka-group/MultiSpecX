@@ -143,7 +143,6 @@ def rotation_matrix(va, vb):
       case is addressed below too
    """
    fc: float 
-   indl: int 
 
    uva = va/np.linalg.norm(va)
    uvb = vb/np.linalg.norm(vb)
@@ -165,7 +164,6 @@ def rotation_matrix(va, vb):
    else:
       s = v/norm_v
       c = np.dot(uva,uvb)
-
    
       # work on this below, make return statement for c=-1
       if c > -1.0:
@@ -296,7 +294,7 @@ def include_CG_atoms(xyz, xyz_ref, cut, cgS):
    
    return list(atoms_include)
 
-def exclude_chrom_atoms(atoms, atoms_exclude) -> List[int]:
+def exclude_atoms_from_list(atoms, atoms_exclude) -> List[int]:
    """
       Exclude atoms of the chromophore from atoms list
    """
