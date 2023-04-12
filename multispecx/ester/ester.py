@@ -1,6 +1,7 @@
 import mdtraj as md
 import time
 import os
+from tqdm import tqdm
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -109,7 +110,8 @@ class Ester:
       print(f"       Total number of frames to read: {self.nframes}")
       print(f"       Timestep: {t.timestep:.3f} [ps]")
 
-      for frame in range(self.nframes):
+      for frame in tqdm(range(self.nframes)):
+      #for frame in range(self.nframes):
 
          xyz_raw = NMTOA*t.xyz[frame,:,:]                #units=A
          box     = NMTOA*t.unitcell_lengths[frame,:]     #units=A
@@ -141,6 +143,9 @@ class Ester:
             atoms_include2 = exclude_atoms_from_list(atoms_include1, chrom)
             # remove other atoms here
             atoms_include = exclude_atoms_from_list(atoms_include2, add_exclude_num[chind])
+            # do it like this:
+            #atoms_include = exclude_atoms_from_list(atoms_include1, [chrom,add_exclude_num[chind]])
+            # then make a loop over combined lists
             
             # coordinate transformation for all included_atoms and ester unit
             ester_t, envr_t = transformXYZ(self.transform_internal[chind], xyz_chrom, xyz[atoms_include,:])
