@@ -147,7 +147,6 @@ def rotation_matrix(va, vb):
    uva = va/np.linalg.norm(va)
    uvb = vb/np.linalg.norm(vb)
 
-   # check conditions when v below can become zero
    v = np.cross(uva, uvb)
 
    norm_v = np.linalg.norm(v)
@@ -305,7 +304,6 @@ def getCOMChg(xyz, cgS, masses):
       Returns center of masses of all charge groups
    """
    nchg = len(cgS)-1
-   natoms = len(masses)
 
    com = np.zeros((nchg,3),dtype=np.float32)
    for n in range(nchg):
