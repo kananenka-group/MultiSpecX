@@ -111,7 +111,6 @@ class Ester:
       print(f"       Timestep: {t.timestep:.3f} [ps]")
 
       for frame in tqdm(range(self.nframes)):
-      #for frame in range(self.nframes):
 
          xyz_raw = NMTOA*t.xyz[frame,:,:]                #units=A
          box     = NMTOA*t.unitcell_lengths[frame,:]     #units=A
