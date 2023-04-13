@@ -342,9 +342,13 @@ def getCOM(xyz, mass):
    return com
 
 def getInternalTransformXYZ(transform_in, atom_names, chrom_idx):
-    print(f" >>>>> Building coordinate transformation matrix.")
-    transform_out = []
-    for chrom_idx_in in chrom_idx:
+   """
+      Translate input transformation instructions into
+      internal transformation procedure
+   """
+   print(f" >>>>> Building coordinate transformation matrix.")
+   transform_out = []
+   for chrom_idx_in in chrom_idx:
       this_chrom=[]
       for item in transform_in:
          if item[0] == 'center': 
@@ -363,7 +367,7 @@ def getInternalTransformXYZ(transform_in, atom_names, chrom_idx):
          this_chrom.append(tloc)
       transform_out.append(this_chrom)
 
-    return transform_out 
+   return transform_out 
 
 def chargeGroupSt(atoms):
    """
@@ -384,7 +388,7 @@ def chargeGroupSt(atoms):
    # add the last atom to terminate the count
    chg.append(len(atoms))
 
-   return np.asarray(chg,dtype=np.int32)
+   return np.array(chg,dtype=np.int32)
 
 def chromList(isotope_labels, search_unit, atoms, atoms_in_mol):
 
