@@ -138,6 +138,7 @@ class Ester:
 
             # save atoms that contribute to efield of this chromophore 
             atoms_include1 = include_CG_atoms(comCg, com, emap_cut, cgS)
+            
             # remove atoms 
             atoms_include = exclude_atoms_from_list(atoms_include1, [chrom])
             
