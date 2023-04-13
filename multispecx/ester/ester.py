@@ -138,13 +138,8 @@ class Ester:
 
             # save atoms that contribute to efield of this chromophore 
             atoms_include1 = include_CG_atoms(comCg, com, emap_cut, cgS)
-            # remove atoms that belong to the chromophore
-            atoms_include2 = exclude_atoms_from_list(atoms_include1, chrom)
-            # remove other atoms here
-            atoms_include = exclude_atoms_from_list(atoms_include2, add_exclude_num[chind])
-            # do it like this:
-            #atoms_include = exclude_atoms_from_list(atoms_include1, [chrom,add_exclude_num[chind]])
-            # then make a loop over combined lists
+            # remove atoms 
+            atoms_include = exclude_atoms_from_list(atoms_include1, [chrom])
             
             # coordinate transformation for all included_atoms and ester unit
             ester_t, envr_t = transformXYZ(self.transform_internal[chind], xyz_chrom, xyz[atoms_include,:])

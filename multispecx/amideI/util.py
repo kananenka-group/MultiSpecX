@@ -298,9 +298,7 @@ def exclude_atoms_from_list(atoms, atoms_exclude) -> List[int]:
    """
       Exclude atoms of the chromophore from atoms list
    """
-   # old
-   #return list(filter(lambda x: x not in atoms_exclude, atoms))
-   return list(filter(lambda x: x not in chain(atoms_exclude), atoms))
+   return list(filter(lambda x: x not in chain(*atoms_exclude), atoms))
    
 def getCOMChg(xyz, cgS, masses):
    """
