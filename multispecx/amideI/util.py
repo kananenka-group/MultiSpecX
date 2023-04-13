@@ -1,6 +1,6 @@
 import numpy as np
-import sys
 import warnings
+from itertools import chain
 
 #from colorama import Fore
 # pip install colorama
@@ -298,7 +298,9 @@ def exclude_atoms_from_list(atoms, atoms_exclude) -> List[int]:
    """
       Exclude atoms of the chromophore from atoms list
    """
-   return list(filter(lambda x: x not in atoms_exclude, atoms))
+   # old
+   #return list(filter(lambda x: x not in atoms_exclude, atoms))
+   return list(filter(lambda x: x not in chain(atoms_exclude), atoms))
    
 def getCOMChg(xyz, cgS, masses):
    """
