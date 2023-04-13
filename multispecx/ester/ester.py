@@ -140,7 +140,7 @@ class Ester:
             atoms_include1 = include_CG_atoms(comCg, com, emap_cut, cgS)
             
             # remove atoms 
-            atoms_include = exclude_atoms_from_list(atoms_include1, [chrom])
+            atoms_include = exclude_atoms_from_list(atoms_include1, [chrom,add_exclude_num[chind]])
             
             # coordinate transformation for all included_atoms and ester unit
             ester_t, envr_t = transformXYZ(self.transform_internal[chind], xyz_chrom, xyz[atoms_include,:])
