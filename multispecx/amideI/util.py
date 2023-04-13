@@ -242,7 +242,8 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
       else:
          raise ValueError(f" Cannot recognize this transformation operation {item}")
 
-   # check the distance w.r.t ref atom before and after transformaton:
+   # check the distance w.r.t ref atom before and after the transformaton
+   # and throw in a warning if distance changes by more than the defined threshold
    for n in range(solu_xyz.shape[0]):
       bf = np.linalg.norm(np.subtract(solu_xyz[atom_center,:],solu_xyz[n,:]))
       af = np.linalg.norm(np.subtract(solu_xyz_t[atom_center,:],solu_xyz_t[n,:]))
@@ -250,7 +251,8 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
       if np.max(np.abs(su_er)) > thresh:
          print(" Before = ",solu_xyz[n,:])
          print(" After = ",solu_xyz_t[n,:])
-         su_er*=100
+         su_er*=100.0
+         print(" {su_er:.2f} % ")
          warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {su_er:.2f} %.")
 
    for n in range(solv_xyz.shape[0]):
@@ -260,7 +262,8 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
       if np.max(np.abs(sv_er)) > thresh:
          print(" Before = ",solv_xyz[n,:])
          print(" After = ",solv_xyz_t[n,:])
-         sv_er*=100
+         sv_er*=100.0
+         print(" {sv_er:.2f} % ")
          warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {sv_er:.2f} %.")
 
    return solu_xyz_t, solv_xyz_t
