@@ -1,5 +1,6 @@
 import numpy as np
 import warnings
+from os import sys
 from itertools import chain
 
 #from colorama import Fore
@@ -8,6 +9,17 @@ from datetime import datetime
 from typing import List
 
 from .constants import *
+
+def printChromList(chrom_idx, chrom_unit, molecules, n_chrom_mol, chrom_name):
+   """
+      Print chromophores found in the system
+   """
+   if not chrom_idx:
+      print(f" Did not find any {chrom_name} groups like this: {chrom_unit}")
+      sys.exit(" exiting...")
+   else:
+      print(f"       Found {len(chrom_idx)} ester chromophores: ")
+      [print (f"       {id} in {molid[0]} ") for (id,molid) in zip(n_chrom_mol,molecules) if id>0]
 
 def printDipole(path,Dipole) -> None:
    """
@@ -252,7 +264,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          print(" Before = ",solu_xyz[n,:])
          print(" After = ",solu_xyz_t[n,:])
          su_er*=100.0
-         print(" {su_er:.2f} % ")
+         print(f" {su_er:.2f} % ")
          warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {su_er:.2f} %.")
 
    for n in range(solv_xyz.shape[0]):
@@ -263,7 +275,7 @@ def transformXYZ(transform, solu_xyz, solv_xyz):
          print(" Before = ",solv_xyz[n,:])
          print(" After = ",solv_xyz_t[n,:])
          sv_er*=100.0
-         print(" {sv_er:.2f} % ")
+         print(f" {sv_er:.2f} % ")
          warnings.warn(f" Coordinate transformation error (w.r.t. solute reference atom {atom_center}) = {sv_er:.2f} %.")
 
    return solu_xyz_t, solv_xyz_t
