@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from collections import namedtuple
 import numpy as np
 import sys
 
@@ -71,6 +72,8 @@ class System:
           7. mass
           8. molecule name
           9. id of a molecule this atoms belongs to (w.r.t the total number of molecules)
+
+          Make atom output to be list of named tuples...
 
       """
       #hydrogen_list = ['HW1','HW2','HW','HWT4']
@@ -185,6 +188,9 @@ class System:
       molecule_list = [[] for i in range(len(self.molecules))]
       molecule_find = np.full(len(self.molecules), False)
 
+      #Atom = namedtuple("number","type","residue","molecule","name","chargegroup","charge","mass","molname","molid")
+      #atoms_out=[]
+
       for itp_file in self.itp_files:
          with open(itp_file,"r") as f:
             print(f" >>>>> Reading itp file: {itp_file} ")
@@ -201,8 +207,12 @@ class System:
                         atom=[]
                         if len(lines.split())==7:
                           atom.append(lines.split()[1:7])
+                          # new:
+                          #atm = Atom(*(lines.split()[1:7]))
                         elif len(lines.split())>7:
                           atom.append(lines.split()[1:8])
+                          # new
+                          #atm = Atom(*(lines.split()[1:8]))
                         else:
                           sys.exit(f" Cannot read this line{lines} in {itp_file} wrong number of entries.")
                         molecule_list[index].append(atom[0])
