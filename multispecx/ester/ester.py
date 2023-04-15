@@ -59,7 +59,7 @@ class Ester:
       start_time = time.time()
       printDT("starts")
 
-      emap_cut = 21.0  # units=Angstrom
+      emap_cut = 21.0  # units=A
 
       # create a system object
       s = System(self.itp,self.top,self.gro)
@@ -68,12 +68,8 @@ class Ester:
       # find indices of ester groups in each molecule
       chrom_idx, _, n_ester_mol = chromList(self.isotope_labels, self.ester_unit, self.atoms, self.atoms_in_mol)
       add_exclude_num, add_exclude_nam = self.ester_exclude_list(self.atoms, chrom_idx)
-      if not chrom_idx:
-        print(f" Did not find any ester groups like this: {self.ester_unit}")
-        sys.exit(" exiting...")
-      else:
-        print(f"       Found {len(chrom_idx)} ester chromophores: ")
-        [print (f"       {id} in {molid[0]} ") for (id,molid) in zip(n_ester_mol,self.molecules) if id>0]
+
+      printChromList(chrom_idx, self.ester_unit, self.molecules, n_ester_mol, "ester")
 
       # determine where charge groups start
       cgS = chargeGroupSt(self.atoms)
@@ -140,7 +136,7 @@ class Ester:
             atoms_include1 = include_CG_atoms(comCg, com, emap_cut, cgS)
             
             # remove atoms 
-            atoms_include = exclude_atoms_from_list(atoms_include1, [chrom,add_exclude_num[chind]])
+            atoms_include = exclude_atoms_from_list(atoms_include1, [chrom, add_exclude_num[chind]])
             
             # coordinate transformation for all included_atoms and ester unit
             ester_t, envr_t = transformXYZ(self.transform_internal[chind], xyz_chrom, xyz[atoms_include,:])
